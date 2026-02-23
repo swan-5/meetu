@@ -101,16 +101,15 @@
   </div>
 </section>
   </main>
-
-  <script>
-    // 1. 전역 변수 설정 (가장 위에 한 번만!)
+<script>
+    // 1. 전역 변수 선언
     let curId = null;
     let curUniv = "";
     let curMajor = "";
     let curAge = 0;
     let curGender = "";
 
-    // 2. 페이지 로드 시 실행 (자동 로그인)
+    // 2. 페이지 로드 시 자동 실행
     window.onload = function() {
         const savedUser = localStorage.getItem('meetu_user');
         if (savedUser) {
@@ -121,123 +120,179 @@
             curAge = d.age;
             curGender = d.gender;
             
-            // UI 업데이트
-            if(document.getElementById('pNick')) document.getElementById('pNick').value = d.nickname;
-            alert(d.nickname + "님, 자동으로 로그인되었습니다! ✨");
+            // UI 데이터 채우기
+            if(document.getElementById('pNick')) document.getElementById('pNick').value = d.nickname || "";
+            
+            // 팝업 없이 바로 미팅 목록으로 이동
             go('match'); 
+        } else {
+            // 로그인 정보 없으면 랜딩 페이지로
+            go('landing');
         }
     };
 
-    // 3. 기본 유틸리티 함수
-    function val(id) { return document.getElementById(id).value; }
+    function val(id) { return document.getElementById(id)?.value || ""; }
 
+    // 3. 네비게이션 함수
     function go(id) {
         document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
+        const target = document.getElementById(id);
+        if (target) target.classList.add('active');
+
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         document.querySelector(`[data-tab="${id}"]`)?.classList.add('active');
         
+        // 이동할 때마다 데이터 새로고침
         if(id === 'match') loadRooms();
-        if(id === 'profile' && curId) loadMyRooms(); 
+        if(id === 'profile' && curId) loadMyRooms();
     }
 
-    // 4. 로그인 함수 (핵심!)
+    // 4. 로그인 (성공 시에만 환영 메시지 한 번)
     async function handleLogin() {
-        const loginId = val('lId');
-        const password = val('lPw');
-
-        if (!loginId || !password) return alert("아이디와 비밀번호를 입력해주세요.");
-
         try {
             const res = await fetch('http://127.0.0.1:8000/users/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ login_id: loginId, password: password })
+                body: JSON.stringify({ login_id: val('lId'), password: val('lPw') })
             });
-
             const d = await res.json();
-
             if (res.ok) {
-                if (d.is_verified !== 'verified') {
-                    return alert("아직 학생증 승인 대기 중입니다! 관리자의 승인을 기다려주세요. ⏳");
-                }
-
-                // 변수에 담기
-                curId = d.user_id; curUniv = d.univ; curMajor = d.major; 
-                curAge = d.age; curGender = d.gender;
-
-                // 로컬 스토리지에 저장 (로그인 유지)
+                if (d.is_verified !== 'verified') return alert("학생증 승인 대기 중입니다! ✨");
+                
+                curId = d.user_id; curUniv = d.univ; curMajor = d.major; curGender = d.gender;
                 localStorage.setItem('meetu_user', JSON.stringify(d));
-
+                
                 alert(d.nickname + "님 환영합니다! 💘");
                 go('match');
             } else {
-                alert("로그인 실패: " + (d.detail || "정보를 확인하세요."));
+                alert(d.detail || "로그인 정보를 확인하세요.");
             }
         } catch (e) {
-            console.error(e);
-            alert("서버 연결 실패! FastAPI가 켜져 있나요?");
+            alert("서버 연결 실패!");
         }
     }
 
-    // 5. 로그아웃
-    function logout() {
-        if(!confirm("로그아웃 하시겠습니까?")) return;
-        localStorage.removeItem('meetu_user');
-        location.reload();
-    }
-
-    // 6. 회원가입
-    async function handleRegister(){
-        const f = document.getElementById('studentCard').files[0];
-        if(!f) return alert("학생증 사진을 올려주세요!");
-        const gender = document.querySelector('input[name="gender"]:checked').value;
-        
-        const p = {
-            login_id:val('rId'), password:val('rPw'), name:val('rName'), 
-            university:val('rUniv'), major:val('rMajor'), 
-            age:parseInt(val('rAge')), height:parseInt(val('rHeight')), gender:gender
-        };
-        
-        const res = await fetch('http://127.0.0.1:8000/users/register', {
-            method:'POST', headers:{'Content-Type':'application/json'}, 
-            body:JSON.stringify(p)
-        });
-        const d = await res.json();
-        
-        if(res.ok){
-            const fd = new FormData(); fd.append("file", f);
-            await fetch(`http://127.0.0.1:8000/upload/student-card/${d.user_id}`, {method:'POST', body:fd});
-            alert("가입 성공! 관리자 승인 후 로그인이 가능합니다."); 
-            go('login');
-        } else alert(d.detail);
-    }
-
-    // 7. 미팅룸 관련 함수들 (기존 기능 통합)
+    // 5. 전체 미팅 목록 불러오기 (중요!)
     async function loadRooms() {
-        const res = await fetch('http://127.0.0.1:8000/rooms/');
-        const rooms = await res.json();
-        const container = document.getElementById('roomContainer');
-        container.innerHTML = rooms.map(r => `
-            <div class="card" style="border: 1px solid var(--pink); margin-bottom:15px;">
-                <h3>${r.title} (${r.members.length}/${r.capacity})</h3>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                    ${r.members.map(m => `
-                        <div class="member-card">
-                            <div style="font-size:11px; color:var(--pink);">${m.univ} · ${m.gender}</div>
-                            <div style="font-weight:700;">${m.nickname}</div>
-                        </div>
-                    `).join('')}
+        try {
+            const res = await fetch('http://127.0.0.1:8000/rooms/');
+            const rooms = await res.json();
+            const container = document.getElementById('roomContainer');
+            if(!container) return;
+
+            if(rooms.length === 0) {
+                container.innerHTML = `<p style="text-align:center; padding:40px; color:#888;">현재 개설된 방이 없습니다. 첫 방을 만들어보세요! 🚀</p>`;
+                return;
+            }
+
+            container.innerHTML = rooms.map(r => `
+                <div class="card" style="border: 1px solid var(--pink); margin-bottom:15px; background:rgba(255,255,255,0.02);">
+                    <div style="display:flex; justify-content:space-between;">
+                        <h3 style="margin:0 0 10px 0;">${r.title}</h3>
+                        <span style="color:var(--pink); font-weight:bold;">${r.members.length}/${r.capacity}</span>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                        ${r.members.map(m => `
+                            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:10px;">
+                                <div style="font-size:10px; color:#aaa;">${m.univ}</div>
+                                <div style="font-weight:600; font-size:14px;">${m.nickname}</div>
+                                <div style="font-size:10px; color:var(--pink);">${m.gender}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="btn-primary" onclick="joinRoom(${r.id})" style="margin:0;">참여하기 ✨</button>
                 </div>
-                <button class="btn-primary" onclick="joinRoom(${r.id})">참여하기</button>
+            `).join('');
+        } catch (e) {
+            console.error("목록 로드 에러:", e);
+        }
+    }
+
+    // 6. 방 참여/생성/삭제 등 (기존 로직 유지)
+    async function joinRoom(rid) {
+        if(!curId) return alert("로그인이 필요합니다.");
+        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}/join?user_id=${curId}`, {method:'POST'});
+        if(res.ok) { alert("참여 완료!"); go('match'); } 
+        else { const d = await res.json(); alert(d.detail); }
+    }
+    // 1. 내 미팅 현황 불러오기 함수 (완전 복구)
+async function loadMyRooms() {
+    if(!curId) return;
+    
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/users/${curId}/rooms`);
+        const rooms = await res.json();
+        const container = document.getElementById('myRoomList');
+        
+        if(!container) return;
+
+        if(rooms.length === 0) {
+            container.innerHTML = `<p style="color:var(--muted); font-size:14px; text-align:center; padding:20px;">참여 중인 미팅이 없습니다. 💨</p>`;
+            return;
+        }
+
+        container.innerHTML = rooms.map(r => `
+            <div class="card" style="border: 1px solid ${r.is_creator ? 'var(--pink)' : '#eee'}; background: rgba(255,255,255,0.05); position:relative; padding:20px; border-radius:15px; margin-bottom:10px;">
+                ${r.is_creator ? '<span style="position:absolute; top:10px; right:15px; background:var(--pink); color:white; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:bold;">HOST</span>' : ''}
+                
+                <h4 style="margin:0 0 10px 0; font-size:16px;">${r.title}</h4>
+                <p style="font-size:12px; color:#aaa; margin-bottom:15px;">현재 인원: ${r.current_count} / ${r.capacity}명</p>
+                
+                <div style="display:flex; gap:8px;">
+                    ${r.is_creator ? `
+                        <button onclick="tossLeader(${r.id})" style="flex:1; background:#6c5ce7; color:white; border:none; padding:10px; border-radius:10px; font-size:13px; cursor:pointer; font-weight:bold;">🎲 랜덤 방장 토스</button>
+                        <button onclick="closeRoom(${r.id})" style="flex:1; background:none; border:1px solid var(--pink); color:var(--pink); padding:10px; border-radius:10px; font-size:13px; cursor:pointer; font-weight:bold;">💥 방 폭파하기</button>
+                    ` : `
+                        <button onclick="exitRoom(${r.id})" style="width:100%; background:#555; color:white; border:none; padding:10px; border-radius:10px; font-size:13px; cursor:pointer; font-weight:bold;">👋 방 나가기 (2회 제한)</button>
+                    `}
+                </div>
             </div>
         `).join('');
+    } catch (e) {
+        console.error("내 미팅 로드 에러:", e);
     }
+}
+
+// 2. 방 나가기 기능 (2회 제한 체크)
+async function exitRoom(rid) {
+    if(!confirm("정말 이 방에서 나가시겠습니까?\n(나가는 횟수는 평생 2회로 제한됩니다! ⚠️)")) return;
+    
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}/exit?user_id=${curId}`, { method: 'POST' });
+        const d = await res.json();
+        
+        if(res.ok) {
+            alert("방에서 퇴장하였습니다. 신중한 참여 부탁드려요! ✨");
+            loadMyRooms(); // 목록 새로고침
+        } else {
+            alert(d.detail); // "횟수 초과" 등의 에러 메시지 출력
+        }
+    } catch (e) {
+        alert("서버 연결에 실패했습니다.");
+    }
+}
+
+// 3. 방 폭파 (폐쇄) 기능
+async function closeRoom(rid) {
+    if(!confirm("방을 폭파하시겠습니까? 참여 중인 모든 멤버가 흩어집니다! 💥")) return;
+    
+    try {
+        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}?user_id=${curId}`, { method: 'DELETE' });
+        if(res.ok) {
+            alert("방이 성공적으로 폭파되었습니다.");
+            loadMyRooms();
+        } else {
+            const d = await res.json();
+            alert(d.detail);
+        }
+    } catch (e) {
+        alert("서버 연결 실패!");
+    }
+}
 
     async function createRoomPrompt() {
-        if(!curId) return alert("로그인이 필요합니다.");
-        const title = prompt("방 제목:");
-        const cap = prompt("인원수 (2 또는 3):");
+        const title = prompt("어떤 미팅인가요? (방 제목)");
+        const cap = prompt("인원수 (2 또는 3)");
         if(!title || !cap) return;
         await fetch('http://127.0.0.1:8000/rooms/', {
             method:'POST', headers:{'Content-Type':'application/json'}, 
@@ -246,81 +301,28 @@
         loadRooms();
     }
 
-    async function joinRoom(rid) {
-        if(!curId) return alert("로그인이 필요합니다.");
-        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}/join?user_id=${curId}`, {method:'POST'});
-        if(res.ok) { alert("참여 완료!"); loadRooms(); } 
-        else { const d = await res.json(); alert(d.detail); }
-    }
-
-    // 8. 마이페이지 (내 방 관리)
-    async function loadMyRooms() {
-        // 마이페이지 내 방 목록 렌더링 (디자인 개선)
-async function loadMyRooms() {
-    if(!curId) return;
-    const res = await fetch(`http://127.0.0.1:8000/users/${curId}/rooms`);
-    const rooms = await res.json();
-    const container = document.getElementById('myRoomList');
-    
-    container.innerHTML = rooms.map(r => `
-        <div class="card" style="border: 1px solid ${r.is_creator ? '#ff4b81' : '#eee'}; background: rgba(255,255,255,0.05); position:relative;">
-            ${r.is_creator ? '<span style="position:absolute; top:-10px; right:10px; background:#ff4b81; color:white; padding:2px 8px; border-radius:10px; font-size:10px;">HOST</span>' : ''}
-            <h4 style="margin-bottom:15px;">${r.title}</h4>
-            
-            <div style="display:flex; gap:8px;">
-                ${r.is_creator ? `
-                    <button onclick="tossLeader(${r.id})" style="flex:1; background:#6c5ce7; color:white; border:none; padding:8px; border-radius:8px; font-size:13px; cursor:pointer;">🎲 랜덤 방장 토스</button>
-                    <button onclick="closeRoom(${r.id})" style="flex:1; background:none; border:1px solid #ff4b81; color:#ff4b81; padding:8px; border-radius:8px; font-size:13px; cursor:pointer;">💥 방 폭파하기</button>
-                ` : `
-                    <button onclick="exitRoom(${r.id})" style="width:100%; background:#555; color:white; border:none; padding:8px; border-radius:8px; font-size:13px; cursor:pointer;">👋 방 나가기 (남은횟수 체크)</button>
-                `}
-            </div>
-        </div>
-    `).join('');
-}
-
-// 랜덤 방장 토스 기능
-async function tossLeader(rid) {
-    if(!confirm("방장 권한을 다른 멤버에게 랜덤으로 넘길까요? 🎲")) return;
-    
-    // 1. 현재 방의 멤버 목록을 다시 가져와서 나를 제외한 랜덤 멤버 뽑기
-    const res = await fetch(`http://127.0.0.1:8000/rooms/`); // 전체 방 목록에서 이 방 찾기
-    const allRooms = await res.json();
-    const room = allRooms.find(room => room.id === rid);
-    
-    const others = room.members.filter(m => m.nickname !== document.getElementById('pNick').value);
-    
-    if(others.length === 0) {
-        return alert("넘길 수 있는 다른 멤버가 없습니다! 😭");
+    function logout() {
+        if(confirm("로그아웃 하시겠습니까?")) {
+            localStorage.removeItem('meetu_user');
+            location.reload();
+        }
     }
     
-    const luckyPerson = others[Math.floor(Math.random() * others.length)];
-    
-    // 2. 서버에 방장 변경 요청 (API 주소는 main.py 설정에 맞춤)
-    const tossRes = await fetch(`http://127.0.0.1:8000/rooms/${rid}/handover?creator_id=${curId}&new_creator_id=${luckyPerson.id}`, {
-        method: 'PATCH'
-    });
-
-    if(tossRes.ok) {
-        alert(`${luckyPerson.nickname}님에게 방장 왕관을 넘겼습니다! 👑`);
-        loadMyRooms();
-    } else {
-        alert("권한 이전에 실패했습니다.");
-    }
-}
-    }
-
-    async function exitRoom(rid) {
-        if(!confirm("정말 나가시겠습니까? (평생 2회 제한)")) return;
-        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}/exit?user_id=${curId}`, {method:'POST'});
-        if(res.ok) { alert("나갔습니다."); loadMyRooms(); }
-        else { const d = await res.json(); alert(d.detail); }
-    }
-
-    async function closeRoom(rid) {
-        if(!confirm("방을 폐쇄하시겠습니까?")) return;
-        await fetch(`http://127.0.0.1:8000/rooms/${rid}?user_id=${curId}`, {method:'DELETE'});
-        loadMyRooms();
+    // 마이페이지 내 정보 저장
+    async function handleUpdate() {
+        const p = {
+            user_id: curId,
+            nickname: val('pNick'), university: curUniv, major: curMajor, gender: curGender,
+            height: parseInt(val('pHeight')) || 0,
+            mbti: val('pMbti'), ideal_type: val('pIdeal'), 
+            pref_mbti: val('pPrefMbti'), pref_age: val('pPrefAge'), 
+            must_have: val('pMustHave'), description: val('pDesc'), 
+            meeting_type: "1:1"
+        };
+        const res = await fetch('http://127.0.0.1:8000/profiles/', {
+            method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(p)
+        });
+        if(res.ok) alert("정보가 수정되었습니다! ✨");
     }
 </script>
 
