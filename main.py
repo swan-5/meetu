@@ -120,7 +120,7 @@ async def upload_card(user_id: int, file: UploadFile = File(...), db: Session = 
     path = f"{UPLOAD_DIR}/{user_id}_{file.filename}"
     with open(path, "wb") as buffer: shutil.copyfileobj(file.file, buffer)
     user = db.query(models.User).filter(models.User.id == user_id).first()
-    user.student_card_url = f"http://127.0.0.1:8000/uploads/{user_id}_{file.filename}"
+    user.student_card_url = f"/uploads/{user_id}_{file.filename}"
     db.commit()
     return {"url": user.student_card_url}
 
@@ -188,3 +188,8 @@ def handover_room(room_id: int, creator_id: int, new_creator_id: int, db: Sessio
     room.creator_id = new_creator_id
     db.commit()
     return {"message": "방장이 변경되었습니다."}
+
+@app.get("/")
+async def read_index():
+    # 현재 실행 파일 위치에서 index.html을 찾아 보냅니다.
+    return FileResponse('index.html')

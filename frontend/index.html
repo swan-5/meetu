@@ -150,7 +150,7 @@
     // 4. 로그인 (성공 시에만 환영 메시지 한 번)
     async function handleLogin() {
         try {
-            const res = await fetch('http://127.0.0.1:8000/users/login', {
+            const res = await fetch('/users/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ login_id: val('lId'), password: val('lPw') })
@@ -211,7 +211,7 @@
     // 6. 방 참여/생성/삭제 등 (기존 로직 유지)
     async function joinRoom(rid) {
         if(!curId) return alert("로그인이 필요합니다.");
-        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}/join?user_id=${curId}`, {method:'POST'});
+        const res = await fetch(`/rooms/${rid}/join?user_id=${curId}`, {method:'POST'});
         if(res.ok) { alert("참여 완료!"); go('match'); } 
         else { const d = await res.json(); alert(d.detail); }
     }
@@ -220,7 +220,7 @@ async function loadMyRooms() {
     if(!curId) return;
     
     try {
-        const res = await fetch(`http://127.0.0.1:8000/users/${curId}/rooms`);
+        const res = await fetch(`/users/${curId}/rooms`);
         const rooms = await res.json();
         const container = document.getElementById('myRoomList');
         
@@ -258,7 +258,7 @@ async function exitRoom(rid) {
     if(!confirm("정말 이 방에서 나가시겠습니까?\n(나가는 횟수는 평생 2회로 제한됩니다! ⚠️)")) return;
     
     try {
-        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}/exit?user_id=${curId}`, { method: 'POST' });
+        const res = await fetch(`.0.0.1:8000/rooms/${rid}/exit?user_id=${curId}`, { method: 'POST' });
         const d = await res.json();
         
         if(res.ok) {
@@ -277,7 +277,7 @@ async function closeRoom(rid) {
     if(!confirm("방을 폭파하시겠습니까? 참여 중인 모든 멤버가 흩어집니다! 💥")) return;
     
     try {
-        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}?user_id=${curId}`, { method: 'DELETE' });
+        const res = await fetch(`/rooms/${rid}?user_id=${curId}`, { method: 'DELETE' });
         if(res.ok) {
             alert("방이 성공적으로 폭파되었습니다.");
             loadMyRooms();
@@ -294,7 +294,7 @@ async function closeRoom(rid) {
         const title = prompt("어떤 미팅인가요? (방 제목)");
         const cap = prompt("인원수 (2 또는 3)");
         if(!title || !cap) return;
-        await fetch('http://127.0.0.1:8000/rooms/', {
+        await fetch('/rooms/', {
             method:'POST', headers:{'Content-Type':'application/json'}, 
             body:JSON.stringify({title:title, capacity:parseInt(cap), creator_id:curId})
         });
@@ -319,7 +319,7 @@ async function closeRoom(rid) {
             must_have: val('pMustHave'), description: val('pDesc'), 
             meeting_type: "1:1"
         };
-        const res = await fetch('http://127.0.0.1:8000/profiles/', {
+        const res = await fetch('/profiles/', {
             method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(p)
         });
         if(res.ok) alert("정보가 수정되었습니다! ✨");
