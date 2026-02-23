@@ -188,7 +188,7 @@ def handover_room(room_id: int, creator_id: int, new_creator_id: int, db: Sessio
     room.creator_id = new_creator_id
     db.commit()
     return {"message": "방장이 변경되었습니다."}
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 @app.get("/")
 async def read_index():
     # 경로를 절대 경로로 합쳐서 더 정확하게 파일을 찾게 합니다.
