@@ -1,0 +1,1684 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PinkMeet | 대학생 미팅 매칭</title>
+  <meta name="description" content="대학생 인증 기반 안전 미팅 매칭. 익명 보호, 5:5 성비, 빠른 오픈채팅 연결!" />
+
+  <!-- (선택) 아이콘 폰트: 외부 링크 싫으면 삭제 가능 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg0:#0b0610;
+      --bg1:#120818;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.10);
+      --stroke: rgba(255,255,255,.14);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+
+      --pink:#ff4fd8;
+      --pink2:#ff7ae6;
+      --rose:#ff3b8d;
+      --peach:#ffb4d7;
+      --mint:#62ffd1;
+
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 18px;
+
+      --good:#62ffd1;
+      --warn:#ffcf5c;
+      --bad:#ff5c7c;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: "Pretendard", system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1100px 700px at 20% -10%, rgba(255,79,216,.35), transparent 60%),
+        radial-gradient(900px 600px at 110% 10%, rgba(255,59,141,.25), transparent 60%),
+        radial-gradient(900px 700px at 70% 120%, rgba(98,255,209,.14), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    button, input, select, textarea{ font:inherit; }
+    .container{ width:min(1100px, 92vw); margin:0 auto; }
+
+    /* Top Nav */
+    .topbar{
+      position: sticky;
+      top:0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(18,8,24,.65);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .topbar-inner{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding: 12px 0;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      letter-spacing: -.2px;
+      white-space: nowrap;
+    }
+    .logo{
+      width:36px; height:36px;
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.95), rgba(255,255,255,.3) 30%, transparent 31%),
+        radial-gradient(circle at 70% 40%, rgba(255,255,255,.95), rgba(255,255,255,.3) 30%, transparent 31%),
+        radial-gradient(40px 30px at 50% 80%, rgba(255,255,255,.55), transparent 70%),
+        linear-gradient(135deg, var(--pink), var(--rose));
+      box-shadow: 0 12px 30px rgba(255,79,216,.25);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    .nav{
+      display:flex;
+      gap:8px;
+      margin-left:auto;
+      overflow:auto;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .tab{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.85);
+      font-weight:600;
+      font-size: 13px;
+      white-space: nowrap;
+      cursor:pointer;
+      transition: .15s transform, .15s background, .15s border-color;
+    }
+    .tab:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
+    .tab.active{
+      background: linear-gradient(135deg, rgba(255,79,216,.35), rgba(255,59,141,.22));
+      border-color: rgba(255,79,216,.35);
+      box-shadow: 0 10px 30px rgba(255,79,216,.12);
+    }
+
+    /* Buttons */
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      font-weight: 700;
+      cursor:pointer;
+      transition: .15s transform, .15s background, .15s box-shadow, .15s border-color;
+      user-select:none;
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
+    .btn:active{ transform: translateY(0px) scale(.99); }
+
+    .btn-primary{
+      border-color: rgba(255,79,216,.35);
+      background: linear-gradient(135deg, rgba(255,79,216,.85), rgba(255,59,141,.70));
+      box-shadow: 0 14px 40px rgba(255,79,216,.18);
+    }
+    .btn-primary:hover{
+      box-shadow: 0 18px 54px rgba(255,79,216,.22);
+      border-color: rgba(255,79,216,.5);
+    }
+    .btn-ghost{
+      background: rgba(255,255,255,.03);
+    }
+    .btn-sm{ padding: 10px 12px; border-radius: 14px; font-size: 13px; }
+
+    /* Sections */
+    main{ padding: 18px 0 80px; }
+    .section{
+      display:none;
+      animation: fadeUp .18s ease both;
+    }
+    .section.active{ display:block; }
+    @keyframes fadeUp{
+      from{ opacity:0; transform: translateY(10px); }
+      to{ opacity:1; transform: translateY(0px); }
+    }
+
+    /* Hero */
+    .hero{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      margin-top: 18px;
+      align-items: stretch;
+    }
+    @media (max-width: 920px){
+      .hero{ grid-template-columns: 1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card-inner{ padding: 18px; }
+
+    .hero-left{
+      position: relative;
+      overflow:hidden;
+    }
+    .hero-left:before{
+      content:"";
+      position:absolute;
+      inset:-40px -40px auto auto;
+      width: 240px; height:240px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 55%),
+                  radial-gradient(circle at 60% 60%, rgba(255,79,216,.55), transparent 65%);
+      filter: blur(2px);
+      transform: rotate(25deg);
+      opacity:.8;
+      pointer-events:none;
+    }
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.88);
+      font-weight: 700;
+    }
+    .k-dot{
+      width:8px; height:8px; border-radius:999px;
+      background: var(--pink);
+      box-shadow: 0 0 0 6px rgba(255,79,216,.15);
+    }
+    h1{
+      margin: 10px 0 10px;
+      font-size: clamp(28px, 4.2vw, 44px);
+      letter-spacing: -1px;
+      line-height: 1.1;
+    }
+    .lead{
+      margin:0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    .hero-cta{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      margin-top: 16px;
+      align-items:center;
+    }
+    .hero-cta .note{
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      font-size: 12px;
+      color: rgba(255,255,255,.78);
+    }
+    .pill strong{ color: rgba(255,255,255,.92); }
+
+    /* Right visual mock */
+    .hero-right{
+      position: relative;
+      overflow:hidden;
+      min-height: 320px;
+      background:
+        radial-gradient(550px 350px at 40% 20%, rgba(255,79,216,.30), transparent 60%),
+        radial-gradient(400px 320px at 80% 60%, rgba(98,255,209,.15), transparent 65%),
+        linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+    }
+    .visual{
+      position:absolute;
+      inset: 16px;
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,.18);
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.25), transparent 40%),
+        radial-gradient(circle at 70% 35%, rgba(255,255,255,.22), transparent 45%),
+        radial-gradient(circle at 45% 65%, rgba(255,79,216,.18), transparent 55%);
+      display:flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 14px;
+      gap: 10px;
+    }
+    .visual-top{
+      display:flex;
+      justify-content: space-between;
+      align-items:flex-start;
+      gap: 10px;
+    }
+    .badge{
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+    }
+    .badge.pink{
+      border-color: rgba(255,79,216,.35);
+      background: rgba(255,79,216,.16);
+    }
+    .bubble-wrap{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap: wrap;
+    }
+    .bubble{
+      max-width: 220px;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.86);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .bubble.me{
+      background: rgba(255,79,216,.14);
+      border-color: rgba(255,79,216,.24);
+    }
+    .visual-bottom{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .mini{
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      padding: 12px;
+    }
+    .mini h3{
+      margin:0 0 6px;
+      font-size: 13px;
+      color: rgba(255,255,255,.9);
+    }
+    .mini p{
+      margin:0;
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      line-height: 1.4;
+    }
+
+    /* Stats row */
+    .stats{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 720px){
+      .stats{ grid-template-columns: 1fr; }
+      .visual-bottom{ grid-template-columns: 1fr; }
+    }
+    .stat{
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .stat .num{
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -.6px;
+    }
+    .stat .lbl{
+      font-size: 12px;
+      color: rgba(255,255,255,.74);
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    .grid2{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .steps{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 840px){ .steps{ grid-template-columns: 1fr; } }
+    .step{
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      position: relative;
+      overflow:hidden;
+    }
+    .step:after{
+      content:"";
+      position:absolute;
+      inset:auto -30px -30px auto;
+      width: 120px; height:120px;
+      background: radial-gradient(circle, rgba(255,79,216,.22), transparent 65%);
+      transform: rotate(25deg);
+      pointer-events:none;
+    }
+    .step .icon{
+      width:40px; height:40px;
+      display:grid; place-items:center;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .step h3{
+      margin:0 0 6px;
+      font-size: 15px;
+      letter-spacing: -.2px;
+    }
+    .step p{
+      margin:0;
+      color: rgba(255,255,255,.72);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    /* Forms */
+    .title-row{
+      display:flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      padding: 6px 2px 14px;
+    }
+    .title-row h2{
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.3px;
+    }
+    .title-row .sub{
+      margin:0;
+      font-size: 13px;
+      color: rgba(255,255,255,.70);
+      line-height: 1.4;
+    }
+
+    .form{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 860px){ .form{ grid-template-columns: 1fr; } }
+    .field{
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    label{
+      font-size: 12px;
+      color: rgba(255,255,255,.78);
+      font-weight: 700;
+    }
+    input[type="text"], input[type="number"], input[type="email"], input[type="password"], select, textarea{
+      width:100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.25);
+      color: rgba(255,255,255,.92);
+      padding: 12px 12px;
+      outline: none;
+    }
+    textarea{ min-height: 110px; resize: vertical; }
+
+    .hint{
+      font-size: 12px;
+      color: rgba(255,255,255,.64);
+      line-height: 1.4;
+    }
+
+    .chipset{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chip{
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.04);
+      padding: 9px 10px;
+      font-size: 12px;
+      color: rgba(255,255,255,.82);
+      cursor:pointer;
+      user-select:none;
+      transition: .15s transform, .15s background, .15s border-color;
+    }
+    .chip:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
+    .chip.active{
+      background: rgba(255,79,216,.18);
+      border-color: rgba(255,79,216,.35);
+      color: rgba(255,255,255,.92);
+    }
+
+    .agree{
+      display:flex;
+      gap: 10px;
+      align-items:flex-start;
+      padding: 12px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .agree input{ margin-top: 2px; }
+    .agree .txt{
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      line-height: 1.45;
+    }
+
+    /* Status & pricing */
+    .status-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 860px){ .status-row{ grid-template-columns: 1fr; } }
+    .status{
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+    }
+    .status .line{
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .tag{
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.05);
+    }
+    .tag.good{ border-color: rgba(98,255,209,.35); background: rgba(98,255,209,.14); }
+    .tag.warn{ border-color: rgba(255,207,92,.35); background: rgba(255,207,92,.12); }
+    .tag.bad { border-color: rgba(255,92,124,.35); background: rgba(255,92,124,.12); }
+
+    .pricing{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 980px){ .pricing{ grid-template-columns: 1fr; } }
+    .plan{
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      position: relative;
+      overflow:hidden;
+    }
+    .plan.featured{
+      border-color: rgba(255,79,216,.35);
+      background: linear-gradient(180deg, rgba(255,79,216,.12), rgba(255,255,255,.05));
+      box-shadow: 0 18px 60px rgba(255,79,216,.12);
+    }
+    .plan h3{ margin:0 0 6px; font-size: 15px; }
+    .price{ font-weight: 900; font-size: 22px; letter-spacing: -.4px; }
+    .plan ul{ margin: 10px 0 0; padding-left: 18px; color: rgba(255,255,255,.74); font-size: 13px; }
+    .plan li{ margin: 6px 0; }
+
+    /* Match result */
+    .result-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    @media (max-width: 920px){ .result-grid{ grid-template-columns: 1fr; } }
+    .profile-card{
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      display:flex;
+      gap: 12px;
+      align-items:flex-start;
+    }
+    .avatar{
+      width: 58px; height:58px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.16);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.35), transparent 60%),
+        linear-gradient(135deg, rgba(255,79,216,.65), rgba(255,59,141,.50));
+      flex: 0 0 auto;
+      box-shadow: 0 10px 28px rgba(255,79,216,.16);
+    }
+    .pmeta h3{ margin:0; font-size: 16px; }
+    .pmeta .small{ margin-top: 4px; color: rgba(255,255,255,.72); font-size: 13px; }
+    .pmeta .kv{
+      margin-top: 10px;
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .kv .pill{ background: rgba(255,255,255,.04); }
+
+    .divider{
+      height:1px;
+      background: rgba(255,255,255,.10);
+      margin: 14px 0;
+    }
+
+    /* FAQ */
+    details{
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      padding: 12px 14px;
+    }
+    details + details{ margin-top: 10px; }
+    summary{
+      cursor:pointer;
+      font-weight: 800;
+      font-size: 14px;
+      color: rgba(255,255,255,.9);
+      list-style:none;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    details p{
+      margin: 10px 0 0;
+      color: rgba(255,255,255,.72);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    /* Bottom CTA */
+    .bottom-cta{
+      margin-top: 16px;
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items:center;
+      justify-content: space-between;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(135deg, rgba(255,79,216,.12), rgba(255,255,255,.04));
+    }
+    .bottom-cta .txt{
+      display:flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .bottom-cta .txt strong{ font-size: 14px; }
+    .bottom-cta .txt span{ font-size: 12px; color: rgba(255,255,255,.72); }
+
+    /* Toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.60);
+      backdrop-filter: blur(10px);
+      color: rgba(255,255,255,.92);
+      font-size: 13px;
+      box-shadow: 0 16px 50px rgba(0,0,0,.35);
+      display:none;
+      z-index: 100;
+      max-width: min(520px, 92vw);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Footer */
+    footer{
+      margin-top: 22px;
+      padding: 22px 0 44px;
+      color: rgba(255,255,255,.55);
+      font-size: 12px;
+      text-align:center;
+    }
+    .tiny-links{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content:center;
+      margin-top: 8px;
+    }
+    .tiny-links a{
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      color: rgba(255,255,255,.72);
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand" role="button" tabindex="0" onclick="go('landing')">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          PinkMeet <span style="opacity:.7;font-weight:700;">· 대학생 매칭</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="페이지 이동">
+        <button class="tab active" data-tab="landing" onclick="go('landing')">메인</button>
+        <button class="tab" data-tab="auth" onclick="go('auth')">가입/인증</button>
+        <button class="tab" data-tab="profile" onclick="go('profile')">프로필/이상형</button>
+        <button class="tab" data-tab="ops" onclick="go('ops')">매칭/결제</button>
+        <button class="tab" data-tab="reveal" onclick="go('reveal')">매칭결과</button>
+        <button class="tab" data-tab="support" onclick="go('support')">고객지원</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 1) LANDING -->
+    <section id="landing" class="section active" aria-labelledby="landingTitle">
+      <div class="hero">
+        <div class="card hero-left">
+          <div class="card-inner">
+            <div class="kicker"><span class="k-dot"></span> 대학생 인증 기반 · 익명 보호 · 빠른 매칭</div>
+            <h1 id="landingTitle">
+              검증된 <span style="color:var(--pink2)">미팅</span><br/>
+            </h1>
+            <p class="lead">
+              실명/번호는 <b>매칭 전까지 완전 비공개</b>. 학생증 인증을 통과한 대학생만 참여해요.
+              <br/>신청서만 딱 쓰면, 나랑 결이 맞는 상대를 찾아 연결해드려요 💌
+            </p>
+
+            <div class="hero-cta">
+              <button class="btn btn-primary" onclick="go('auth')">
+                💘 지금 바로 매칭 신청하기
+              </button>
+              <button class="btn btn-ghost" onclick="scrollToId('guide')">🧭 이용 가이드 보기</button>
+
+              <div class="note">
+                <span class="pill">🔒 <strong>익명 보장</strong> 매칭 전 실명/번호 숨김</span>
+                <span class="pill">🧾 <strong>학생증 인증</strong> 운영자 승인</span>
+              </div>
+            </div>
+
+            <div class="stats" aria-label="서비스 핵심 수치">
+              <div class="stat">
+                <div class="num" id="statMatches">12,480</div>
+                <div class="lbl">누적 매칭 횟수</div>
+              </div>
+              <div class="stat">
+                <div class="num">5 : 5</div>
+                <div class="lbl">성비 밸런스 운영</div>
+              </div>
+              <div class="stat">
+                <div class="num" id="statVerified">8,930</div>
+                <div class="lbl">인증 완료 대학생</div>
+              </div>
+            </div>
+
+            <div id="guide" class="grid2">
+              <div class="title-row">
+                <div>
+                  <h2>3단계 이용 가이드</h2>
+                  <p class="sub">신청 → 대기 → 결과 + 오픈채팅 연결 (진짜 간단)</p>
+                </div>
+                <button class="btn btn-sm" onclick="go('auth')">신청하러 가기 →</button>
+              </div>
+
+              <div class="steps">
+                <div class="step">
+                  <div class="icon">📝</div>
+                  <h3>1) 신청서 작성</h3>
+                  <p>기본 정보 + 이상형 태그를 선택하면 매칭 데이터가 쌓여요.</p>
+                </div>
+                <div class="step">
+                  <div class="icon">⏳</div>
+                  <h3>2) 매칭 대기</h3>
+                  <p>성비와 선호 조건을 기준으로 상대를 찾는 중… 두근두근!</p>
+                </div>
+                <div class="step">
+                  <div class="icon">🎉</div>
+                  <h3>3) 결과 확인 & 연결</h3>
+                  <p>성사되면 오픈채팅 링크로 바로 연결! 약속 장소도 기록 가능.</p>
+                </div>
+              </div>
+
+              <div class="bottom-cta" role="region" aria-label="하단 CTA">
+                <div class="txt">
+                  <strong>지금 신청하면 이번 주 매칭 우선권 💗</strong>
+                  <span>인증 완료 후 매칭이 시작돼요 (보통 1~24시간 이내)</span>
+                </div>
+                <button class="btn btn-primary" onclick="go('auth')">💘 매칭 신청하기</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="card hero-right" aria-label="비주얼 영역">
+          <div class="visual">
+            <div class="visual-top">
+              <div class="bubble-wrap" aria-hidden="true">
+                <div class="bubble me">내 이상형은 대화가 잘 되는 사람!</div>
+                <div class="bubble">나도 말 잘 통하는 사람 최고 🫶</div>
+              </div>
+            </div>
+            <div class="visual-bottom">
+              <div class="mini">
+                <h3>익명 보호</h3>
+                <p>실명/번호는 매칭 전까지 안 보임.<br/>공개 범위는 최소만.</p>
+              </div>
+              <div class="mini">
+                <h3>안전 운영</h3>
+                <p>학생증 인증 + 신고/평가로<br/>서비스 수질 관리.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2) AUTH -->
+    <section id="auth" class="section" aria-labelledby="authTitle">
+      <div class="card">
+        <div class="card-inner">
+          <div class="title-row">
+            <div>
+              <h2 id="authTitle">회원가입 & 본인 인증 (Trust & Safety)</h2>
+              <p class="sub">대학생 전용 증명은 핵심! 학생증 업로드 후 운영자 승인 방식 🧾</p>
+            </div>
+            <button class="btn btn-sm btn-ghost" onclick="go('landing')">← 메인</button>
+          </div>
+
+          <div class="status-row">
+            <div class="status">
+              <div class="line">
+                <strong>인증 상태</strong>
+                <span id="verifyTag" class="tag warn">미인증</span>
+              </div>
+              <div class="hint">
+                학생증 사진 업로드 → 운영자 확인 후 승인됩니다.<br/>
+                ※ 사진/개인정보는 인증 목적 외 사용하지 않으며, 동의 항목에서 명시합니다.
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="field">
+                <label for="studentCard">학생증 사진 업로드</label>
+                <input id="studentCard" type="file" accept="image/*" />
+                <div class="hint" id="fileHint">업로드 전입니다.</div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn btn-sm btn-primary" onclick="requestVerify()">✅ 인증 요청</button>
+                  <button class="btn btn-sm" onclick="fakeApprove()">🧑‍💻 (데모) 운영자 승인</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="status">
+              <div class="line">
+                <strong>간편 로그인</strong>
+                <span class="tag good">신청 허들 ↓</span>
+              </div>
+              <div class="hint">실서비스에서는 OAuth 연동이 필요해요. 여기선 UI만 구현했어!</div>
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
+                <button class="btn btn-sm btn-primary" onclick="toast('카카오 로그인 UI (서버 연동 필요)')">💛 카카오로 시작</button>
+                <button class="btn btn-sm" onclick="toast('구글 로그인 UI (서버 연동 필요)')">🟦 구글로 시작</button>
+                <button class="btn btn-sm btn-ghost" onclick="toast('이메일 가입 UI (서버 연동 필요)')">✉️ 이메일로 가입</button>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="agree">
+                <input id="agreeAll" type="checkbox" />
+                <div class="txt">
+                  <b>이용 약관/개인정보 동의</b><br/>
+                  (필수) 개인정보 수집·이용 동의 · (필수) 사진(학생증) 처리 동의 · (선택) 마케팅 수신 동의
+                  <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                    <a class="pill" href="javascript:void(0)" onclick="openModal('terms')">📄 이용약관 보기</a>
+                    <a class="pill" href="javascript:void(0)" onclick="openModal('privacy')">🔐 개인정보 처리방침</a>
+                    <a class="pill" href="javascript:void(0)" onclick="openModal('photo')">🧾 사진 처리 안내</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bottom-cta" style="margin-top: 12px;">
+                <div class="txt">
+                  <strong>인증 + 동의 완료되면 프로필 작성으로 넘어가요 💗</strong>
+                  <span>익명성 보장을 위해, 매칭 전까지는 닉네임만 노출됩니다.</span>
+                </div>
+                <button class="btn btn-primary" onclick="go('profile')">프로필 작성하기 →</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 3) PROFILE -->
+    <section id="profile" class="section" aria-labelledby="profileTitle">
+      <div class="card">
+        <div class="card-inner">
+          <div class="title-row">
+            <div>
+              <h2 id="profileTitle">프로필 & 이상형 작성 (Match-making Data)</h2>
+              <p class="sub">수동 매칭 질문을 “데이터화”해서 더 잘 맞는 사람을 찾아요 💌</p>
+            </div>
+            <button class="btn btn-sm btn-ghost" onclick="go('auth')">← 가입/인증</button>
+          </div>
+
+          <div class="form" aria-label="프로필 입력">
+            <div class="field">
+              <label>닉네임 (실명 X)</label>
+              <input id="nick" type="text" placeholder="예: 달콤딸기 / 카페러버 / 도서관요정" />
+              <div class="hint">매칭 전까지는 닉네임만 공개돼요.</div>
+            </div>
+
+            <div class="field">
+              <label>학교</label>
+              <input id="univ" type="text" placeholder="예: OO대학교" />
+            </div>
+
+            <div class="field">
+              <label>학과</label>
+              <input id="major" type="text" placeholder="예: 경영학과 / 전기전자공학과" />
+            </div>
+
+            <div class="field">
+              <label>나이</label>
+              <input id="age" type="number" min="18" max="29" placeholder="예: 22" />
+            </div>
+
+            <div class="field">
+              <label>키</label>
+              <input id="height" type="number" min="130" max="210" placeholder="예: 165" />
+            </div>
+
+            <div class="field">
+              <label>MBTI</label>
+              <select id="mbti">
+                <option value="">선택</option>
+                <option>ISTJ</option><option>ISFJ</option><option>INFJ</option><option>INTJ</option>
+                <option>ISTP</option><option>ISFP</option><option>INFP</option><option>INTP</option>
+                <option>ESTP</option><option>ESFP</option><option>ENFP</option><option>ENTP</option>
+                <option>ESTJ</option><option>ESFJ</option><option>ENFJ</option><option>ENTJ</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>취미</label>
+              <input id="hobby" type="text" placeholder="예: 카페투어, 러닝, 전시회, 게임, 여행" />
+            </div>
+
+            <div class="field">
+              <label>매력 키워드</label>
+              <input id="charm" type="text" placeholder="예: 다정함 / 리액션 요정 / 계획형 / 웃음 많음" />
+            </div>
+
+            <div class="field">
+              <label>사진 업로드 (선택/필수 설정 가능)</label>
+              <input id="photo" type="file" accept="image/*" />
+              <div class="hint">운영 정책에 따라 “필수”로도 바꿀 수 있어요.</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="title-row">
+            <div>
+              <h2>선호 상대 (이상형)</h2>
+              <p class="sub">희망 나이대/학교군/기피 특징/가치관을 선택해줘요.</p>
+            </div>
+          </div>
+
+          <div class="form" aria-label="이상형 입력">
+            <div class="field">
+              <label>희망 나이대</label>
+              <select id="prefAge">
+                <option value="">선택</option>
+                <option>동갑 선호</option>
+                <option>연상 선호</option>
+                <option>연하 선호</option>
+                <option>상관없음</option>
+                <option>20-22</option>
+                <option>23-25</option>
+                <option>26-29</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>선호 학교군(거리/분위기)</label>
+              <select id="prefUnivGroup">
+                <option value="">선택</option>
+                <option>같은 지역(가까운 거리)</option>
+                <option>수도권</option>
+                <option>지방권</option>
+                <option>상관없음</option>
+                <option>비슷한 캠퍼스 분위기</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>기피하는 특징</label>
+              <input id="avoid" type="text" placeholder="예: 무례함, 연락 잠수, 과한 음주" />
+              <div class="hint">차별/혐오 표현은 금지(운영정책).</div>
+            </div>
+
+            <div class="field">
+              <label>중시하는 가치관</label>
+              <input id="value" type="text" placeholder="예: 대화/배려/성실함/유머/취향 공유" />
+            </div>
+
+            <div class="field" style="grid-column: 1 / -1;">
+              <label>자기소개 키워드 태그</label>
+              <div class="chipset" id="introChips">
+                <span class="chip" data-chip="술보다는 카페">☕ 술보다는 카페</span>
+                <span class="chip" data-chip="대화가 잘 통하는">🫶 대화가 잘 통하는</span>
+                <span class="chip" data-chip="전시/공연 좋아">🎭 전시/공연 좋아</span>
+                <span class="chip" data-chip="산책/드라이브">🚗 산책/드라이브</span>
+                <span class="chip" data-chip="게임/덕질">🎮 게임/덕질</span>
+                <span class="chip" data-chip="연락 빠른 편">⚡ 연락 빠른 편</span>
+                <span class="chip" data-chip="조용한 편">🤫 조용한 편</span>
+                <span class="chip" data-chip="활발한 편">✨ 활발한 편</span>
+              </div>
+              <div class="hint" style="margin-top:8px;">태그는 매칭 정확도를 올려줘요.</div>
+            </div>
+          </div>
+
+          <div class="bottom-cta">
+            <div class="txt">
+              <strong>프로필 저장하고 매칭으로 넘어갈까요? 💗</strong>
+              <span>데모에서는 브라우저에 임시 저장됩니다(localStorage).</span>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn" onclick="saveProfile()">저장</button>
+              <button class="btn btn-primary" onclick="go('ops')">매칭/결제 →</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 4) OPS -->
+    <section id="ops" class="section" aria-labelledby="opsTitle">
+      <div class="card">
+        <div class="card-inner">
+          <div class="title-row">
+            <div>
+              <h2 id="opsTitle">매칭 관리 & 결제 (Operation)</h2>
+              <p class="sub">진행 상태를 한눈에. 매칭권 구매 + 쿠폰으로 가볍게 시작!</p>
+            </div>
+            <button class="btn btn-sm btn-ghost" onclick="go('profile')">← 프로필</button>
+          </div>
+
+          <div class="status-row">
+            <div class="status">
+              <div class="line">
+                <strong>진행 현황</strong>
+                <span id="matchTag" class="tag warn">매칭 대기 중</span>
+              </div>
+              <div class="hint">
+                상태 예시: <b>매칭 대기 중</b> → <b>상대방 찾는 중</b> → <b>매칭 완료</b><br/>
+                (실서비스는 서버에서 상태를 내려줍니다)
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 12px;">
+                <button class="btn btn-sm" onclick="setStatus('wait')">⏳ 대기</button>
+                <button class="btn btn-sm" onclick="setStatus('search')">🔎 찾는 중</button>
+                <button class="btn btn-sm btn-primary" onclick="setStatus('done')">🎉 완료</button>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="field">
+                <label>쿠폰/포인트</label>
+                <input id="coupon" type="text" placeholder="예: FRIEND10 / WELCOME5" />
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn btn-sm" onclick="applyCoupon()">적용</button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('친구 초대 링크 공유 UI (연동 필요)')">친구 초대하기</button>
+                </div>
+                <div class="hint" id="couponHint">쿠폰이 없으면 그냥 진행해도 돼요.</div>
+              </div>
+            </div>
+
+            <div class="status">
+              <div class="line">
+                <strong>결제 모듈</strong>
+                <span class="tag good">매칭권 구매</span>
+              </div>
+              <div class="hint">실서비스: 토스페이/카카오페이/카드 결제 연동 또는 무통장 입금 확인.</div>
+
+              <div class="pricing" aria-label="요금제">
+                <div class="plan">
+                  <h3>1회권</h3>
+                  <div class="price">₩ 9,900</div>
+                  <ul>
+                    <li>매칭 1회</li>
+                    <li>성사 시 오픈채팅 연결</li>
+                    <li>미성사 시 정책에 따른 재매칭/환불</li>
+                  </ul>
+                  <div style="margin-top: 12px;">
+                    <button class="btn btn-sm btn-primary" onclick="buy('1회권')">구매</button>
+                  </div>
+                </div>
+
+                <div class="plan featured">
+                  <h3>패키지권</h3>
+                  <div class="price">₩ 24,900</div>
+                  <ul>
+                    <li>매칭 3회</li>
+                    <li>우선 매칭 옵션(이벤트 기간)</li>
+                    <li>쿠폰 중복 혜택 가능</li>
+                  </ul>
+                  <div style="margin-top: 12px;">
+                    <button class="btn btn-sm btn-primary" onclick="buy('패키지권')">구매</button>
+                  </div>
+                </div>
+
+                <div class="plan">
+                  <h3>프리미엄</h3>
+                  <div class="price">₩ 39,900</div>
+                  <ul>
+                    <li>매칭 5회</li>
+                    <li>매칭 선호도 더 정교</li>
+                    <li>CS 우선 응대</li>
+                  </ul>
+                  <div style="margin-top: 12px;">
+                    <button class="btn btn-sm btn-primary" onclick="buy('프리미엄')">구매</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="field">
+                <label>무통장 입금(옵션) 안내</label>
+                <div class="hint">
+                  데모 텍스트: “입금 확인 후 매칭권이 지급됩니다.”<br/>
+                  <b>계좌/예금주</b>는 실서비스에서 노출. (관리자 페이지 필요)
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-cta">
+            <div class="txt">
+              <strong>매칭 완료되면 결과 페이지에서 ‘빅 리빌’ 💘</strong>
+              <span>데모에서는 버튼으로 바로 이동 가능!</span>
+            </div>
+            <button class="btn btn-primary" onclick="go('reveal')">매칭 결과 보기 →</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 5) REVEAL -->
+    <section id="reveal" class="section" aria-labelledby="revealTitle">
+      <div class="card">
+        <div class="card-inner">
+          <div class="title-row">
+            <div>
+              <h2 id="revealTitle">매칭 결과 (The Big Reveal)</h2>
+              <p class="sub">성사되면 상대 프로필(공개 범위만) + 오픈채팅 링크를 보여줘요 🎉</p>
+            </div>
+            <button class="btn btn-sm btn-ghost" onclick="go('ops')">← 매칭/결제</button>
+          </div>
+
+          <div class="result-grid">
+            <div class="status">
+              <div class="line">
+                <strong>상대방 프로필 카드</strong>
+                <span class="tag good">이름(실명) 제외</span>
+              </div>
+
+              <div class="profile-card" aria-label="상대 프로필">
+                <div class="avatar" aria-hidden="true"></div>
+                <div class="pmeta">
+                  <h3>별명: <span id="mateNick">핑크하트</span> 💗</h3>
+                  <div class="small" id="mateMeta">OO대학교 · 사회과학계열 · 23세</div>
+                  <div class="kv" id="mateKv">
+                    <span class="pill">☕ 카페파</span>
+                    <span class="pill">🫶 대화 중요</span>
+                    <span class="pill">🎭 전시 좋아</span>
+                    <span class="pill">✨ 리액션 좋음</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="field">
+                <label>연결 수단</label>
+                <div class="hint">
+                  매칭 성공 시 상대의 카카오톡 ID 공개 또는 서비스 내 오픈채팅 링크 제공.
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
+                  <button class="btn btn-sm btn-primary" onclick="toast('오픈채팅 링크로 이동 (실서비스 링크 필요)')">💬 오픈채팅 참여하기</button>
+                  <button class="btn btn-sm" onclick="toast('카카오 ID 공개 UI (정책/동의 필요)')">🆔 카카오 ID 보기</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="status">
+              <div class="line">
+                <strong>약속 장소 기록</strong>
+                <span class="tag warn">데이터 쌓이면 추천</span>
+              </div>
+
+              <div class="field">
+                <label>약속 장소</label>
+                <input id="meetPlace" type="text" placeholder="예: 홍대입구 8번 출구 / OO카페 앞" />
+              </div>
+
+              <div class="field">
+                <label>날짜/시간</label>
+                <input id="meetTime" type="text" placeholder="예: 2/28(토) 19:00" />
+              </div>
+
+              <div class="field">
+                <label>메모</label>
+                <textarea id="meetMemo" placeholder="예: 너무 늦으면 톡 주세요! / 복장: 핑크 포인트"></textarea>
+                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                  <button class="btn btn-sm btn-primary" onclick="saveMeetPlan()">저장</button>
+                  <button class="btn btn-sm" onclick="toast('다음엔 장소 추천 기능으로 발전 가능!')">추천 기능 아이디어 💡</button>
+                </div>
+                <div class="hint" id="meetHint">아직 저장되지 않았어요.</div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="field">
+                <label>매너 평가 / 신고</label>
+                <div class="hint">
+                  매칭 후 피드백은 서비스 수질을 올려요. 악성/무례 유저는 즉시 신고!
+                </div>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;">
+                  <button class="btn btn-sm" onclick="toast('매너 평가 UI (서버 저장 필요)')">⭐ 매너 평가</button>
+                  <button class="btn btn-sm btn-ghost" onclick="toast('신고 접수 UI (서버/운영 프로세스 필요)')">🚨 신고하기</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="bottom-cta">
+            <div class="txt">
+              <strong>다음 매칭도 도전할래요? 💗</strong>
+              <span>매칭권이 있으면 바로 다시 신청 가능!</span>
+            </div>
+            <button class="btn btn-primary" onclick="go('ops')">다시 매칭하기 →</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 6) SUPPORT -->
+    <section id="support" class="section" aria-labelledby="supportTitle">
+      <div class="card">
+        <div class="card-inner">
+          <div class="title-row">
+            <div>
+              <h2 id="supportTitle">고객 지원 & 커뮤니티 (Retention)</h2>
+              <p class="sub">공지/이벤트/FAQ/신고로 운영 신뢰도 업업 🔥</p>
+            </div>
+            <button class="btn btn-sm btn-ghost" onclick="go('landing')">← 메인</button>
+          </div>
+
+          <div class="status-row">
+            <div class="status">
+              <div class="line">
+                <strong>공지사항 & 이벤트</strong>
+                <span class="tag good">이번 주 HOT</span>
+              </div>
+
+              <div class="field">
+                <label>이벤트 예시</label>
+                <div class="hint" style="line-height:1.6;">
+                  🎀 이번 주 <b>OO대 vs OO대</b> 특별 매칭<br/>
+                  💗 “카페파 모여라” 취향 기반 테마 매칭<br/>
+                  🥳 친구 초대하면 <b>할인권</b> 즉시 지급
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-sm btn-primary" onclick="toast('공지 상세 페이지 연결(추가 구현)')">공지 더 보기</button>
+                <button class="btn btn-sm" onclick="toast('이벤트 참여 폼 연결(추가 구현)')">이벤트 참여</button>
+              </div>
+            </div>
+
+            <div class="status">
+              <div class="line">
+                <strong>자주 묻는 질문(FAQ)</strong>
+                <span class="tag warn">운영 정책</span>
+              </div>
+
+              <details>
+                <summary>인증은 얼마나 걸리나요?</summary>
+                <p>보통 1~24시간 이내 승인됩니다. (피크 타임에는 조금 더 걸릴 수 있어요.)</p>
+              </details>
+              <details>
+                <summary>매칭이 안 되면 환불되나요?</summary>
+                <p>정책 예시: 일정 기간 내 미성사 시 재매칭 제공 또는 환불/포인트 보상 중 선택.</p>
+              </details>
+              <details>
+                <summary>왜 실명/전화번호를 안 받나요?</summary>
+                <p>익명성 보장을 통해 안전하게 시작하게 하기 위함이에요. 성사 후 연결 수단만 제공해요.</p>
+              </details>
+              <details>
+                <summary>부적절한 유저는 어떻게 처리하나요?</summary>
+                <p>신고/평가 데이터를 기반으로 경고·정지·영구 차단 등 단계적 제재가 가능해요.</p>
+              </details>
+
+              <div class="divider"></div>
+
+              <div class="field">
+                <label>문의하기</label>
+                <input type="text" placeholder="예: 결제가 안돼요 / 인증이 반려됐어요" />
+                <textarea placeholder="상세 내용을 적어주세요. (스크린샷 첨부 기능은 추가 구현)"></textarea>
+                <button class="btn btn-sm btn-primary" onclick="toast('문의 접수 완료(데모)')">문의 접수</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="bottom-cta">
+            <div class="txt">
+              <strong>핑크미트는 “안전 + 설렘” 밸런스가 핵심 💗</strong>
+              <span>운영 정책/동의 문구를 명확히 하면 신뢰도가 확 올라가요.</span>
+            </div>
+            <button class="btn btn-primary" onclick="go('auth')">지금 신청하기 →</button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> PinkMeet. All rights reserved.
+      <div class="tiny-links">
+        <a href="javascript:void(0)" onclick="openModal('terms')">이용약관</a>
+        <a href="javascript:void(0)" onclick="openModal('privacy')">개인정보</a>
+        <a href="javascript:void(0)" onclick="openModal('policy')">운영정책</a>
+      </div>
+      <div style="margin-top:10px; opacity:.8;">
+        데모 화면입니다. 실제 서비스는 로그인/결제/인증/매칭 로직을 서버와 연동해야 합니다.
+      </div>
+    </footer>
+  </main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Simple Modal (terms/privacy/photo/policy) -->
+  <dialog id="modal" style="
+    width:min(720px, 92vw);
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 18px;
+    background: rgba(12,6,18,.92);
+    color: rgba(255,255,255,.92);
+    box-shadow: 0 24px 80px rgba(0,0,0,.55);
+    padding: 0;
+  ">
+    <div style="padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,.10); display:flex; align-items:center; justify-content:space-between; gap:10px;">
+      <strong id="modalTitle">안내</strong>
+      <button class="btn btn-sm" onclick="closeModal()">닫기</button>
+    </div>
+    <div id="modalBody" style="padding: 14px 16px; max-height: 60vh; overflow:auto; color: rgba(255,255,255,.78); line-height:1.65; font-size: 13px;"></div>
+  </dialog>
+
+  <script>
+    const state = {
+      verified: false,
+      matchStatus: 'wait',
+      selectedChips: new Set(),
+      couponApplied: null,
+      lastPurchase: null
+    };
+
+    const modalText = {
+      terms: {
+        title: "이용약관(요약)",
+        body: `
+          <p><b>핵심</b>: 본 서비스는 대학생 인증 기반 매칭 플랫폼이며, 허위 정보/사칭/무례 행위는 제재 대상입니다.</p>
+          <ul>
+            <li>매칭 전까지는 익명(닉네임)만 노출됩니다.</li>
+            <li>오픈채팅/연결은 매칭 성공 시에만 제공됩니다.</li>
+            <li>부적절한 행위(성희롱/혐오/사기/도용/잠수)는 경고·정지·영구 차단될 수 있습니다.</li>
+          </ul>
+          <p style="opacity:.9">※ 실제 서비스에서는 전문 약관을 법률 검토 후 게시하세요.</p>
+        `
+      },
+      privacy: {
+        title: "개인정보 처리방침(요약)",
+        body: `
+          <p><b>수집 항목</b>: 닉네임, 학교/학과, 나이, 키, MBTI, 취미, 태그, (선택) 사진, 결제 정보(연동 시), 학생증 이미지(인증 목적).</p>
+          <p><b>이용 목적</b>: 대학생 인증, 매칭 제공, 고객지원, 부정 이용 방지.</p>
+          <p><b>보관 기간</b>: 목적 달성 후 즉시 파기 원칙(단, 법령상 보관 필요 시 예외).</p>
+        `
+      },
+      photo: {
+        title: "사진(학생증) 처리 안내",
+        body: `
+          <p><b>학생증 사진</b>은 “대학생 인증”을 위해서만 사용합니다.</p>
+          <ul>
+            <li>운영자 확인 후 승인/반려 처리</li>
+            <li>인증 완료 후 불필요 정보(학번 등)는 마스킹/파기 정책 권장</li>
+            <li>사진/개인정보는 제3자 제공하지 않음(법적 요청 제외)</li>
+          </ul>
+        `
+      },
+      policy: {
+        title: "운영정책(요약)",
+        body: `
+          <p><b>성비 밸런스</b>와 <b>안전</b>을 위해 운영자가 일부 조건을 조정할 수 있습니다.</p>
+          <ul>
+            <li>허위 정보, 사칭, 불쾌감 유발 행위: 즉시 제재</li>
+            <li>신고 누적/평가 점수 기반: 경고 → 일시 정지 → 영구 차단</li>
+            <li>환불/재매칭: 정책에 따라 처리</li>
+          </ul>
+        `
+      }
+    };
+
+    function go(id){
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById(id);
+      if(el) el.classList.add('active');
+
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      const tab = document.querySelector(`.tab[data-tab="${id}"]`);
+      if(tab) tab.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function scrollToId(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block:'start' });
+    }
+
+    // Chips
+    document.addEventListener('click', (e) => {
+      const chip = e.target.closest('.chip');
+      if(!chip) return;
+      chip.classList.toggle('active');
+      const key = chip.dataset.chip;
+      if(chip.classList.contains('active')) state.selectedChips.add(key);
+      else state.selectedChips.delete(key);
+    });
+
+    // File upload hint
+    const studentCard = document.getElementById('studentCard');
+    const fileHint = document.getElementById('fileHint');
+    studentCard?.addEventListener('change', () => {
+      const f = studentCard.files?.[0];
+      if(!f){
+        fileHint.textContent = '업로드 전입니다.';
+        return;
+      }
+      fileHint.textContent = `선택됨: ${f.name} (${Math.round(f.size/1024)}KB)`;
+    });
+
+    function requestVerify(){
+      if(!document.getElementById('agreeAll').checked){
+        toast('약관/개인정보 동의(필수)를 체크해줘요 🙏');
+        return;
+      }
+      const f = studentCard.files?.[0];
+      if(!f){
+        toast('학생증 사진을 먼저 업로드해줘요 🧾');
+        return;
+      }
+      toast('인증 요청 완료! 운영자가 확인 중이에요 ⏳');
+      // 실제 서비스: 서버로 업로드 + 상태 업데이트
+    }
+
+    function fakeApprove(){
+      if(!document.getElementById('agreeAll').checked){
+        toast('동의 체크가 필요해요 🙏');
+        return;
+      }
+      state.verified = true;
+      const tag = document.getElementById('verifyTag');
+      tag.className = 'tag good';
+      tag.textContent = '인증 완료';
+      toast('✅ 인증 완료! 이제 매칭 신청 가능 💗');
+    }
+
+    // Profile save
+    function saveProfile(){
+      const payload = {
+        nick: val('nick'),
+        univ: val('univ'),
+        major: val('major'),
+        age: val('age'),
+        height: val('height'),
+        mbti: val('mbti'),
+        hobby: val('hobby'),
+        charm: val('charm'),
+        prefAge: val('prefAge'),
+        prefUnivGroup: val('prefUnivGroup'),
+        avoid: val('avoid'),
+        value: val('value'),
+        chips: Array.from(state.selectedChips)
+      };
+      localStorage.setItem('pinkmeet_profile', JSON.stringify(payload));
+      toast('프로필 저장 완료 💾');
+      // 결과 페이지에 일부 반영
+      hydrateMateCard(payload);
+    }
+
+    function hydrateMateCard(p){
+      // 데모: 사용자의 취향 태그 일부를 상대 카드에 반영하는 느낌
+      const kv = document.getElementById('mateKv');
+      if(!kv) return;
+      const chips = (p?.chips?.length ? p.chips : ["술보다는 카페","대화가 잘 통하는","전시/공연 좋아"]).slice(0,4);
+      kv.innerHTML = chips.map(c => `<span class="pill">💗 ${escapeHtml(c)}</span>`).join('');
+    }
+
+    // Matching status
+    function setStatus(s){
+      state.matchStatus = s;
+      const tag = document.getElementById('matchTag');
+      if(s === 'wait'){
+        tag.className = 'tag warn';
+        tag.textContent = '매칭 대기 중';
+        toast('⏳ 매칭 대기 중');
+      } else if(s === 'search'){
+        tag.className = 'tag warn';
+        tag.textContent = '상대방 찾는 중';
+        toast('🔎 상대방 찾는 중…');
+      } else {
+        tag.className = 'tag good';
+        tag.textContent = '매칭 완료';
+        toast('🎉 매칭 완료! 결과 페이지로 가봐요');
+      }
+    }
+
+    // Coupon
+    function applyCoupon(){
+      const c = (val('coupon') || '').trim().toUpperCase();
+      const hint = document.getElementById('couponHint');
+      if(!c){
+        hint.textContent = '쿠폰 코드를 입력해줘요.';
+        toast('쿠폰 코드를 입력해줘요 🧾');
+        return;
+      }
+      if(c === 'FRIEND10'){
+        state.couponApplied = { code:c, off:'10%' };
+        hint.textContent = '✅ FRIEND10 적용: 10% 할인!';
+        toast('FRIEND10 적용 완료 💗');
+      } else if(c === 'WELCOME5'){
+        state.couponApplied = { code:c, off:'5%' };
+        hint.textContent = '✅ WELCOME5 적용: 5% 할인!';
+        toast('WELCOME5 적용 완료 💗');
+      } else {
+        hint.textContent = '❌ 유효하지 않은 쿠폰이에요.';
+        toast('유효하지 않은 쿠폰이에요 🥺');
+      }
+    }
+
+    // Buy
+    function buy(plan){
+      if(!state.verified){
+        toast('대학생 인증 완료 후 구매/매칭이 가능해요 🧾');
+        go('auth');
+        return;
+      }
+      state.lastPurchase = plan;
+      toast(`구매 선택: ${plan} (실결제는 연동 필요)`);
+      // 실제 서비스: 결제 모듈 호출 후 서버에서 매칭권 지급
+    }
+
+    // Meet plan
+    function saveMeetPlan(){
+      const payload = {
+        place: val('meetPlace'),
+        time: val('meetTime'),
+        memo: val('meetMemo')
+      };
+      localStorage.setItem('pinkmeet_meet', JSON.stringify(payload));
+      document.getElementById('meetHint').textContent = '✅ 저장 완료! (데모: 브라우저에 저장됨)';
+      toast('약속 정보 저장 완료 💾');
+    }
+
+    // Modal
+    function openModal(key){
+      const m = document.getElementById('modal');
+      const data = modalText[key] || { title:'안내', body:'내용이 없습니다.' };
+      document.getElementById('modalTitle').textContent = data.title;
+      document.getElementById('modalBody').innerHTML = data.body;
+      m.showModal();
+    }
+    function closeModal(){
+      document.getElementById('modal').close();
+    }
+
+    // Toast
+    let toastTimer = null;
+    function toast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { t.style.display = 'none'; }, 2400);
+    }
+
+    // Helpers
+    function val(id){
+      const el = document.getElementById(id);
+      return el ? el.value : '';
+    }
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    // Init
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Load saved profile if exists
+    try{
+      const p = JSON.parse(localStorage.getItem('pinkmeet_profile') || 'null');
+      if(p){
+        const map = ['nick','univ','major','age','height','mbti','hobby','charm','prefAge','prefUnivGroup','avoid','value'];
+        map.forEach(k => {
+          const el = document.getElementById(k);
+          if(el && p[k] != null) el.value = p[k];
+        });
+        // chips
+        if(Array.isArray(p.chips)){
+          p.chips.forEach(c => state.selectedChips.add(c));
+          document.querySelectorAll('#introChips .chip').forEach(ch => {
+            if(state.selectedChips.has(ch.dataset.chip)) ch.classList.add('active');
+          });
+        }
+        hydrateMateCard(p);
+      }
+      const meet = JSON.parse(localStorage.getItem('pinkmeet_meet') || 'null');
+      if(meet){
+        if(document.getElementById('meetPlace')) document.getElementById('meetPlace').value = meet.place || '';
+        if(document.getElementById('meetTime')) document.getElementById('meetTime').value = meet.time || '';
+        if(document.getElementById('meetMemo')) document.getElementById('meetMemo').value = meet.memo || '';
+        const hint = document.getElementById('meetHint');
+        if(hint) hint.textContent = '✅ 저장된 약속 정보가 있어요.';
+      }
+    }catch(e){ /* ignore */ }
+
+    // Demo stats animation-ish
+    (function bumpStats(){
+      const m = document.getElementById('statMatches');
+      const v = document.getElementById('statVerified');
+      if(!m || !v) return;
+      let matches = 12480;
+      let verified = 8930;
+      setInterval(() => {
+        matches += Math.random() < .35 ? 1 : 0;
+        verified += Math.random() < .15 ? 1 : 0;
+        m.textContent = matches.toLocaleString('ko-KR');
+        v.textContent = verified.toLocaleString('ko-KR');
+      }, 1400);
+    })();
+  </script>
+</body>
+</html>
