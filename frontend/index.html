@@ -1,254 +1,328 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MeetU | 대학생 팀 미팅</title>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MeetU | 프라이빗 팀 미팅</title>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg0: #0b0610; --bg1: #120818;
-      --pink: #ff4fd8; --rose: #ff3b8d; --purple: #9d50bb;
-      --text: rgba(255, 255, 255, 0.92); --muted: rgba(255, 255, 255, 0.6);
-      --glass: rgba(255, 255, 255, 0.05);
-      --border: rgba(255, 255, 255, 0.1);
-    }
-
-    * { box-sizing: border-box; transition: all 0.3s ease; }
-    body {
-      margin: 0; font-family: "Pretendard", sans-serif; color: var(--text);
-      background: radial-gradient(circle at 20% 20%, rgba(157, 80, 187, 0.2), transparent 40%),
-                  radial-gradient(circle at 80% 80%, rgba(255, 79, 216, 0.15), transparent 40%),
-                  var(--bg0);
-      min-height: 100vh; overflow-x: hidden;
-    }
-
+    :root { --bg0: #0b0610; --pink: #ff4fd8; --rose: #ff3b8d; --text: rgba(255, 255, 255, 0.9); --border: rgba(255, 255, 255, 0.1); }
+    * { box-sizing: border-box; transition: 0.3s; }
+    body { margin:0; font-family: "Pretendard"; color: var(--text); background: var(--bg0); min-height: 100vh; overflow-x: hidden; }
     .container { width: min(1000px, 92vw); margin: 0 auto; }
-
-    /* Header & Nav */
-    .topbar {
-      position: sticky; top: 0; z-index: 100;
-      backdrop-filter: blur(15px); background: rgba(11, 6, 16, 0.7);
-      border-bottom: 1px solid var(--border); padding: 12px 0;
-    }
+    .topbar { position: sticky; top: 0; z-index: 100; backdrop-filter: blur(15px); background: rgba(11, 6, 16, 0.7); border-bottom: 1px solid var(--border); padding: 12px 0; }
     .topbar-inner { display: flex; align-items: center; justify-content: space-between; }
-    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.2rem; cursor: pointer; }
     .nav { display: flex; gap: 8px; }
-    .tab {
-      padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border);
-      background: var(--glass); color: white; cursor: pointer; font-size: 13px; font-weight: 600;
-    }
-    .tab.active { background: linear-gradient(135deg, var(--pink), var(--rose)); border: none; box-shadow: 0 4px 15px rgba(255, 79, 216, 0.3); }
-
-    /* Section Control */
-    .section { display: none; padding: 40px 0 100px; animation: fadeIn 0.5s ease both; }
+    .tab { padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: white; cursor: pointer; font-weight: 600; }
+    .tab.active { background: linear-gradient(135deg, var(--pink), var(--rose)); border: none; }
+    .section { display: none; padding: 40px 0; animation: fadeIn 0.5s ease both; }
     .section.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Landing (Hero) Style */
-    #landing { height: 75vh; display: flex; align-items: center; justify-content: center; text-align: center; }
-    .hero-card {
-      background: var(--glass); border: 1px solid var(--border); border-radius: 30px;
-      padding: 60px 40px; backdrop-filter: blur(20px); box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-      width: 100%; animation: float 4s ease-in-out infinite;
-    }
+    .card { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 24px; padding: 24px; backdrop-filter: blur(10px); }
+    .hero-card { text-align: center; padding: 60px 40px; animation: float 4s infinite; }
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-    .gradient-text { background: linear-gradient(to right, var(--pink), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-
-    /* Common Card Style */
-    .card { background: var(--glass); border: 1px solid var(--border); border-radius: 24px; padding: 32px; backdrop-filter: blur(10px); }
-    h2 { margin-top: 0; font-weight: 800; font-size: 1.8rem; }
-
-    /* Form Styles */
-    .form { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-    @media (max-width: 600px) { .form { grid-template-columns: 1fr; } }
-    .field { display: flex; flex-direction: column; gap: 8px; }
-    label { font-size: 13px; font-weight: 700; color: var(--muted); }
-    input, textarea {
-      background: rgba(0,0,0,0.3); border: 1px solid var(--border);
-      color: white; padding: 14px; border-radius: 12px; font-size: 15px;
-    }
-    input:focus { border-color: var(--pink); outline: none; background: rgba(0,0,0,0.5); }
-
-    /* Buttons */
-    .btn-primary {
-      background: linear-gradient(135deg, var(--pink), var(--rose));
-      color: white; border: none; padding: 16px; border-radius: 14px;
-      font-weight: 800; font-size: 1.1rem; cursor: pointer; width: 100%; margin-top: 20px;
-    }
-    .btn-primary:hover { transform: scale(1.02); box-shadow: 0 10px 25px rgba(255, 79, 216, 0.4); }
-
-    .toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%); padding: 12px 24px; border-radius: 999px; background: rgba(255,255,255,0.9); color: #000; font-weight: 700; display: none; z-index: 1000; }
-  .matching-status {
-  padding: 40px;
-  border: 2px dashed var(--border);
-  border-radius: 20px;
-  margin-top: 20px;
-  background: rgba(255, 79, 216, 0.03);
-}
-.pulse-icon {
-  font-size: 3rem;
-  animation: pulse 2s infinite;
-}
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.7; }
-  100% { transform: scale(1); opacity: 1; }
-}
+    .form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+    input, textarea { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 12px; }
+    .btn-primary { background: linear-gradient(135deg, var(--pink), var(--rose)); color: white; border: none; padding: 16px; border-radius: 14px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 20px; }
+    .chip-radio { display: none; }
+    .chip-label { padding: 10px 20px; border-radius: 999px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); cursor: pointer; font-size: 14px; display: inline-block; }
+    .chip-radio:checked + .chip-label { background: var(--pink); border-color: var(--pink); }
+    .member-card { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid var(--border); }
   </style>
 </head>
 <body>
-
- <header class="topbar">
-    <div class="container topbar-inner">
-      <div class="brand" onclick="go('landing')">
-        <img src="logo.jpg" alt="logo" style="width:32px; height:32px; border-radius:8px; object-fit:cover;">
-        <span>Meet<span class="gradient-text">U</span></span>
-      </div>
-      <nav class="nav">
-        <button class="tab active" data-tab="landing" onclick="go('landing')">홈</button>
-        <button class="tab" data-tab="login" onclick="go('login')">로그인</button>
-        <button class="tab" data-tab="auth" onclick="go('auth')">회원가입</button>
-        <button class="tab" data-tab="profile" onclick="go('profile')">마이페이지</button>
-        <button class="tab" data-tab="match" onclick="go('match')">매칭현황</button> </nav>
+  <header class="topbar"><div class="container topbar-inner">
+    <div class="brand" onclick="go('landing')" style="cursor:pointer; font-weight:800; display:flex; align-items:center;">
+        <img src="logo.jpg" style="width:30px; border-radius:5px; margin-right:10px;">MeetU
     </div>
-</header>
+    <nav class="nav">
+      <button class="tab active" data-tab="landing" onclick="go('landing')">홈</button>
+      <button class="tab" data-tab="login" onclick="go('login')">로그인</button>
+      <button class="tab" data-tab="auth" onclick="go('auth')">회원가입</button>
+      <button class="tab" data-tab="match" onclick="go('match')">미팅룸</button>
+      <button class="tab" data-tab="profile" onclick="go('profile')">마이페이지</button>
+    </nav>
+  </div></header>
 
   <main class="container">
-    <section id="landing" class="section active">
-      <div class="hero-card">
-        <div style="font-size: 3rem; margin-bottom: 10px;">💘</div>
-        <h1>Meet<span class="gradient-text">U</span></h1>
-        <p>우리끼리 더 즐거운 시간,<br>검증된 대학생들의 <strong>프라이빗 팀 미팅</strong></p>
-        <button class="btn-primary" style="max-width: 280px;" onclick="go('match')">지금 시작하기 🚀</button>
-      </div>
-    </section>
-    <section id="match" class="section">
-      <div class="card" style="text-align: center;">
-        <h2>매칭 현황 ✨</h2>
-        <div class="matching-status">
-            <div class="pulse-icon">🔍</div>
-            <h3 style="margin-top: 20px;">나와 딱 맞는 팀을 찾는 중...</h3>
-            <p style="color: var(--muted);">학생증 인증이 완료되면 매칭이 시작됩니다.</p>
-        </div>
-        <div style="margin-top: 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="card" style="padding: 15px; font-size: 14px;">현재 대기 팀: <strong>12팀</strong></div>
-            <div class="card" style="padding: 15px; font-size: 14px;">오늘 매칭 완료: <strong>5건</strong></div>
-        </div>
-        <button class="btn-primary" style="margin-top: 30px; background: none; border: 1px solid var(--pink); color: var(--pink);" onclick="go('profile')">내 프로필 수정하러 가기</button>
-      </div>
-    </section>
+    <section id="landing" class="section active"><div class="hero-card"><h1>MeetU 💘</h1><p>대학생 프라이빗 팀 미팅</p><button class="btn-primary" onclick="go('match')">지금 시작하기 🚀</button></div></section>
 
+    <section id="login" class="section"><div class="card" style="max-width:450px; margin:0 auto;"><h2>로그인</h2><input id="lId" style="width:100%" placeholder="아이디"><input id="lPw" type="password" style="width:100%; margin-top:10px;" placeholder="비밀번호"><button class="btn-primary" onclick="handleLogin()">로그인</button></div></section>
 
-    <section id="login" class="section">
-      <div class="card" style="max-width: 450px; margin: 0 auto;">
-        <h2> Login </h2>
-        <div class="field" style="margin-top: 20px;"><label>아이디</label><input id="lId" type="text" placeholder="아이디를 입력하세요"></div>
-        <div class="field" style="margin-top: 15px;"><label>비밀번호</label><input id="lPw" type="password" placeholder="비밀번호를 입력하세요"></div>
-        <button class="btn-primary" onclick="handleLogin()">로그인하기</button>
-      </div>
-    </section>
-
-    <section id="auth" class="section">
-      <div class="card">
-        <h2>멤버 가입하기 📝</h2>
-        <div class="form">
-          <div class="field"><label>아이디</label><input id="rId" type="text"></div>
-          <div class="field"><label>비밀번호</label><input id="rPw" type="password"></div>
-          <div class="field"><label>이름(실명)</label><input id="rName" type="text"></div>
-          <div class="field"><label>학교</label><input id="rUniv" type="text" placeholder="00대학교"></div>
-          <div class="field"><label>학과</label><input id="rMajor" type="text" placeholder="00학과"></div>
-          <div class="field"><label>나이</label><input id="rAge" type="number"></div>
-          <div class="field"><label>키(cm)</label><input id="rHeight" type="number"></div>
-          <div class="field" style="grid-column: 1/-1;">
-            <label>학생증 사진 업로드 (인증용)</label>
-            <input id="studentCard" type="file" accept="image/*">
-          </div>
+    <section id="auth" class="section"><div class="card"><h2>회원가입</h2><div class="form">
+        <div style="grid-column: 1/-1;"><label>성별</label><br>
+            <input type="radio" id="gM" name="gender" value="남성" checked class="chip-radio"><label for="gM" class="chip-label">남성</label>
+            <input type="radio" id="gF" name="gender" value="여성" class="chip-radio"><label for="gF" class="chip-label">여성</label>
         </div>
-        <button class="btn-primary" onclick="handleRegister()">가입 및 인증요청 ✨</button>
-      </div>
-    </section>
+        <input id="rId" placeholder="아이디"><input id="rPw" type="password" placeholder="비번"><input id="rName" placeholder="이름">
+        <input id="rUniv" placeholder="학교"><input id="rMajor" placeholder="학과"><input id="rAge" type="number" placeholder="나이"><input id="rHeight" type="number" placeholder="키(cm)">
+        <input id="studentCard" type="file" style="grid-column: 1/-1;">
+    </div><button class="btn-primary" onclick="handleRegister()">가입하기</button></div></section>
 
-    <section id="profile" class="section">
-      <div class="card">
-        <h2>내 프로필 관리 💎</h2>
-        <div class="form">
-          <div class="field"><label>닉네임</label><input id="pNick" type="text"></div>
-          <div class="field"><label>나의 MBTI</label><input id="pMbti" type="text"></div>
-          <div class="field"><label>현재 키(cm)</label><input id="pHeight" type="number"></div>
-          <div class="field"><label>이상형</label><input id="pIdeal" type="text"></div>
-          <div class="field"><label>선호 MBTI</label><input id="pPrefMbti" type="text"></div>
-          <div class="field"><label>선호 나이대</label><input id="pPrefAge" type="text"></div>
-          <div class="field" style="grid-column: 1/-1;"><label>이건 놓치기 싫다! ✨</label><input id="pMustHave" type="text" placeholder="예: 비흡연자, 연락 속도 등"></div>
-          <div class="field" style="grid-column: 1/-1;"><label>자기소개 및 취미</label><textarea id="pDesc" rows="3"></textarea></div>
+    <section id="match" class="section"><div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;"><h2>미팅 대기실 🔥</h2><button class="tab" onclick="createRoomPrompt()">+ 방 만들기</button></div>
+        <div id="roomContainer" style="margin-top:20px; display:grid; gap:20px;"></div>
+    </div></section>
+
+   
+<section id="profile" class="section">
+  <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+        <h2 style="margin:0;">마이페이지 💎</h2>
+        <button onclick="logout()" style="background:none; border:1px solid var(--pink); color:var(--pink); padding:6px 14px; border-radius:20px; font-size:12px; cursor:pointer; font-weight:700;">로그아웃</button>
+    </div>
+    
+    <div class="form">
+        <div class="field"><label>닉네임</label><input id="pNick" placeholder="닉네임 입력"></div>
+        <div class="field"><label>키 (cm)</label><input id="pHeight" type="number" placeholder="180"></div>
+        <div class="field"><label>나의 MBTI</label><input id="pMbti" placeholder="ENFP"></div>
+        <div class="field"><label>이상형</label><input id="pIdeal" placeholder="웃는 게 예쁜 사람"></div>
+        <div class="field"><label>선호 MBTI</label><input id="pPrefMbti" placeholder="I형 선호"></div>
+        <div class="field"><label>선호 나이대</label><input id="pPrefAge" placeholder="20~25세"></div>
+        <div class="field" style="grid-column: 1/-1;">
+            <label>이건 놓치기 싫다! ✨</label>
+            <input id="pMustHave" placeholder="예: 비흡연자, 연락 속도 등" style="width:100%;">
         </div>
-        <button class="btn-primary" onclick="handleUpdate()">정보 업데이트 완료 💾</button>
-      </div>
-    </section>
+        <div class="field" style="grid-column: 1/-1;">
+            <label>자기소개 및 취미</label>
+            <textarea id="pDesc" rows="3" placeholder="나를 한 줄로 표현한다면?" style="width:100%; font-family:inherit;"></textarea>
+        </div>
+    </div>
+    <button class="btn-primary" onclick="handleUpdate()">정보 저장하고 반영하기 ✨</button>
+
+    <div style="margin-top: 50px;">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:20px;">
+            <h3 style="color: var(--pink); margin:0;">나의 미팅 현황 💘</h3>
+            <span style="font-size:12px; color:var(--muted);">(방에서 나갈 수 있는 기회는 단 2번!)</span>
+        </div>
+        <div id="myRoomList" style="display: grid; gap: 15px;">
+            <p style="color:var(--muted); font-size:14px; text-align:center; padding:20px;">참여 중인 미팅이 없습니다.</p>
+        </div>
+    </div>
+  </div>
+</section>
   </main>
 
-  <div id="toast" class="toast"></div>
-
   <script>
-    let curId = null, curUniv = "", curMajor = "", curAge = 0;
+    // 1. 전역 변수 설정 (가장 위에 한 번만!)
+    let curId = null;
+    let curUniv = "";
+    let curMajor = "";
+    let curAge = 0;
+    let curGender = "";
+
+    // 2. 페이지 로드 시 실행 (자동 로그인)
+    window.onload = function() {
+        const savedUser = localStorage.getItem('meetu_user');
+        if (savedUser) {
+            const d = JSON.parse(savedUser);
+            curId = d.user_id;
+            curUniv = d.univ;
+            curMajor = d.major;
+            curAge = d.age;
+            curGender = d.gender;
+            
+            // UI 업데이트
+            if(document.getElementById('pNick')) document.getElementById('pNick').value = d.nickname;
+            alert(d.nickname + "님, 자동으로 로그인되었습니다! ✨");
+            go('match'); 
+        }
+    };
+
+    // 3. 기본 유틸리티 함수
+    function val(id) { return document.getElementById(id).value; }
 
     function go(id) {
-      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    const activeTab = document.querySelector(`[data-tab="${id}"]`);
-    if(activeTab) activeTab.classList.add('active');
-    window.scrollTo(0,0);
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelector(`[data-tab="${id}"]`)?.classList.add('active');
+        
+        if(id === 'match') loadRooms();
+        if(id === 'profile' && curId) loadMyRooms(); 
     }
 
-    function val(id) { return document.getElementById(id).value; }
-    function toast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.style.display = 'block';
-      setTimeout(() => t.style.display = 'none', 2500);
-    }
-
-    async function handleRegister() {
-      const f = document.getElementById('studentCard').files[0];
-      if(!f) return alert("학생증 사진을 올려주세요!");
-      const p = {login_id:val('rId'), password:val('rPw'), name:val('rName'), university:val('rUniv'), major:val('rMajor'), age:parseInt(val('rAge'))||0, height:parseInt(val('rHeight'))||0};
-      
-      try {
-        const res = await fetch('http://127.0.0.1:8000/users/register', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(p)});
-        const d = await res.json();
-        if(res.ok){
-          const fd = new FormData(); fd.append("file", f);
-          await fetch(`http://127.0.0.1:8000/upload/student-card/${d.user_id}`, {method:'POST', body:fd});
-          alert("가입 성공! 이제 로그인해주세요."); go('login');
-        } else alert(d.detail);
-      } catch(e) { alert("서버 연결 실패!"); }
-    }
-
+    // 4. 로그인 함수 (핵심!)
     async function handleLogin() {
-      try {
-        const res = await fetch('http://127.0.0.1:8000/users/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({login_id:val('lId'), password:val('lPw')})});
-        const d = await res.json();
-        if(res.ok){
-          curId=d.user_id; curUniv=d.univ; curMajor=d.major; curAge=d.age;
-          toast("반가워요, " + d.nickname + "님! ✨");
-          document.getElementById('pNick').value = d.nickname;
-          go('profile');
-        } else alert("로그인 정보를 확인해주세요.");
-      } catch(e) { alert("서버 연결 실패!"); }
+        const loginId = val('lId');
+        const password = val('lPw');
+
+        if (!loginId || !password) return alert("아이디와 비밀번호를 입력해주세요.");
+
+        try {
+            const res = await fetch('http://127.0.0.1:8000/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ login_id: loginId, password: password })
+            });
+
+            const d = await res.json();
+
+            if (res.ok) {
+                if (d.is_verified !== 'verified') {
+                    return alert("아직 학생증 승인 대기 중입니다! 관리자의 승인을 기다려주세요. ⏳");
+                }
+
+                // 변수에 담기
+                curId = d.user_id; curUniv = d.univ; curMajor = d.major; 
+                curAge = d.age; curGender = d.gender;
+
+                // 로컬 스토리지에 저장 (로그인 유지)
+                localStorage.setItem('meetu_user', JSON.stringify(d));
+
+                alert(d.nickname + "님 환영합니다! 💘");
+                go('match');
+            } else {
+                alert("로그인 실패: " + (d.detail || "정보를 확인하세요."));
+            }
+        } catch (e) {
+            console.error(e);
+            alert("서버 연결 실패! FastAPI가 켜져 있나요?");
+        }
     }
 
-    async function handleUpdate() {
-      if(!curId) return alert("로그인이 필요합니다.");
-      const p = {
-        user_id:curId, nickname:val('pNick'), university:curUniv, major:curMajor, age:curAge, 
-        height:parseInt(val('pHeight'))||0, mbti:val('pMbti'), ideal_type:val('pIdeal'), 
-        pref_mbti:val('pPrefMbti'), pref_age:val('pPrefAge'), must_have:val('pMustHave'), 
-        description:val('pDesc'), meeting_type:"1:1"
-      };
-      const res = await fetch('http://127.0.0.1:8000/profiles/', {method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(p)});
-      if(res.ok) toast("프로필이 업데이트되었습니다! 💾");
-      else alert("저장 실패");
+    // 5. 로그아웃
+    function logout() {
+        if(!confirm("로그아웃 하시겠습니까?")) return;
+        localStorage.removeItem('meetu_user');
+        location.reload();
     }
-  </script>
+
+    // 6. 회원가입
+    async function handleRegister(){
+        const f = document.getElementById('studentCard').files[0];
+        if(!f) return alert("학생증 사진을 올려주세요!");
+        const gender = document.querySelector('input[name="gender"]:checked').value;
+        
+        const p = {
+            login_id:val('rId'), password:val('rPw'), name:val('rName'), 
+            university:val('rUniv'), major:val('rMajor'), 
+            age:parseInt(val('rAge')), height:parseInt(val('rHeight')), gender:gender
+        };
+        
+        const res = await fetch('http://127.0.0.1:8000/users/register', {
+            method:'POST', headers:{'Content-Type':'application/json'}, 
+            body:JSON.stringify(p)
+        });
+        const d = await res.json();
+        
+        if(res.ok){
+            const fd = new FormData(); fd.append("file", f);
+            await fetch(`http://127.0.0.1:8000/upload/student-card/${d.user_id}`, {method:'POST', body:fd});
+            alert("가입 성공! 관리자 승인 후 로그인이 가능합니다."); 
+            go('login');
+        } else alert(d.detail);
+    }
+
+    // 7. 미팅룸 관련 함수들 (기존 기능 통합)
+    async function loadRooms() {
+        const res = await fetch('http://127.0.0.1:8000/rooms/');
+        const rooms = await res.json();
+        const container = document.getElementById('roomContainer');
+        container.innerHTML = rooms.map(r => `
+            <div class="card" style="border: 1px solid var(--pink); margin-bottom:15px;">
+                <h3>${r.title} (${r.members.length}/${r.capacity})</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    ${r.members.map(m => `
+                        <div class="member-card">
+                            <div style="font-size:11px; color:var(--pink);">${m.univ} · ${m.gender}</div>
+                            <div style="font-weight:700;">${m.nickname}</div>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn-primary" onclick="joinRoom(${r.id})">참여하기</button>
+            </div>
+        `).join('');
+    }
+
+    async function createRoomPrompt() {
+        if(!curId) return alert("로그인이 필요합니다.");
+        const title = prompt("방 제목:");
+        const cap = prompt("인원수 (2 또는 3):");
+        if(!title || !cap) return;
+        await fetch('http://127.0.0.1:8000/rooms/', {
+            method:'POST', headers:{'Content-Type':'application/json'}, 
+            body:JSON.stringify({title:title, capacity:parseInt(cap), creator_id:curId})
+        });
+        loadRooms();
+    }
+
+    async function joinRoom(rid) {
+        if(!curId) return alert("로그인이 필요합니다.");
+        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}/join?user_id=${curId}`, {method:'POST'});
+        if(res.ok) { alert("참여 완료!"); loadRooms(); } 
+        else { const d = await res.json(); alert(d.detail); }
+    }
+
+    // 8. 마이페이지 (내 방 관리)
+    async function loadMyRooms() {
+        // 마이페이지 내 방 목록 렌더링 (디자인 개선)
+async function loadMyRooms() {
+    if(!curId) return;
+    const res = await fetch(`http://127.0.0.1:8000/users/${curId}/rooms`);
+    const rooms = await res.json();
+    const container = document.getElementById('myRoomList');
+    
+    container.innerHTML = rooms.map(r => `
+        <div class="card" style="border: 1px solid ${r.is_creator ? '#ff4b81' : '#eee'}; background: rgba(255,255,255,0.05); position:relative;">
+            ${r.is_creator ? '<span style="position:absolute; top:-10px; right:10px; background:#ff4b81; color:white; padding:2px 8px; border-radius:10px; font-size:10px;">HOST</span>' : ''}
+            <h4 style="margin-bottom:15px;">${r.title}</h4>
+            
+            <div style="display:flex; gap:8px;">
+                ${r.is_creator ? `
+                    <button onclick="tossLeader(${r.id})" style="flex:1; background:#6c5ce7; color:white; border:none; padding:8px; border-radius:8px; font-size:13px; cursor:pointer;">🎲 랜덤 방장 토스</button>
+                    <button onclick="closeRoom(${r.id})" style="flex:1; background:none; border:1px solid #ff4b81; color:#ff4b81; padding:8px; border-radius:8px; font-size:13px; cursor:pointer;">💥 방 폭파하기</button>
+                ` : `
+                    <button onclick="exitRoom(${r.id})" style="width:100%; background:#555; color:white; border:none; padding:8px; border-radius:8px; font-size:13px; cursor:pointer;">👋 방 나가기 (남은횟수 체크)</button>
+                `}
+            </div>
+        </div>
+    `).join('');
+}
+
+// 랜덤 방장 토스 기능
+async function tossLeader(rid) {
+    if(!confirm("방장 권한을 다른 멤버에게 랜덤으로 넘길까요? 🎲")) return;
+    
+    // 1. 현재 방의 멤버 목록을 다시 가져와서 나를 제외한 랜덤 멤버 뽑기
+    const res = await fetch(`http://127.0.0.1:8000/rooms/`); // 전체 방 목록에서 이 방 찾기
+    const allRooms = await res.json();
+    const room = allRooms.find(room => room.id === rid);
+    
+    const others = room.members.filter(m => m.nickname !== document.getElementById('pNick').value);
+    
+    if(others.length === 0) {
+        return alert("넘길 수 있는 다른 멤버가 없습니다! 😭");
+    }
+    
+    const luckyPerson = others[Math.floor(Math.random() * others.length)];
+    
+    // 2. 서버에 방장 변경 요청 (API 주소는 main.py 설정에 맞춤)
+    const tossRes = await fetch(`http://127.0.0.1:8000/rooms/${rid}/handover?creator_id=${curId}&new_creator_id=${luckyPerson.id}`, {
+        method: 'PATCH'
+    });
+
+    if(tossRes.ok) {
+        alert(`${luckyPerson.nickname}님에게 방장 왕관을 넘겼습니다! 👑`);
+        loadMyRooms();
+    } else {
+        alert("권한 이전에 실패했습니다.");
+    }
+}
+    }
+
+    async function exitRoom(rid) {
+        if(!confirm("정말 나가시겠습니까? (평생 2회 제한)")) return;
+        const res = await fetch(`http://127.0.0.1:8000/rooms/${rid}/exit?user_id=${curId}`, {method:'POST'});
+        if(res.ok) { alert("나갔습니다."); loadMyRooms(); }
+        else { const d = await res.json(); alert(d.detail); }
+    }
+
+    async function closeRoom(rid) {
+        if(!confirm("방을 폐쇄하시겠습니까?")) return;
+        await fetch(`http://127.0.0.1:8000/rooms/${rid}?user_id=${curId}`, {method:'DELETE'});
+        loadMyRooms();
+    }
+</script>
+
 </body>
 </html>

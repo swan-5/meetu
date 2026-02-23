@@ -2,194 +2,52 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MeetU Admin | 관리자 대시보드</title>
+    <title>MeetU 관리자 모드</title>
     <style>
-        :root {
-            --bg: #0b0610;
-            --card: rgba(255, 255, 255, 0.05);
-            --pink: #ff4fd8;
-            --mint: #62ffd1;
-            --red: #ff5c7c;
-            --text: rgba(255, 255, 255, 0.9);
-        }
-
-        body {
-            font-family: 'Pretendard', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 40px;
-        }
-
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            color: var(--pink);
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-
-        p {
-            opacity: 0.7;
-            margin-bottom: 30px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--card);
-            border-radius: 15px;
-            overflow: hidden;
-        }
-
-        th {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            text-align: left;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 15px;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-approve {
-            background: var(--mint);
-            color: var(--bg);
-        }
-
-        .btn-approve:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(98, 255, 209, 0.3);
-        }
-
-        .btn-reject {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text);
-            margin-left: 8px;
-        }
-
-        .status-pending { color: #ffcf5c; font-weight: bold; }
-        .status-approved { color: var(--mint); font-weight: bold; }
-        .status-rejected { color: var(--red); font-weight: bold; }
-
-        .img-link {
-            color: var(--pink);
-            text-decoration: none;
-            font-weight: 800;
-            padding: 5px 10px;
-            border: 1px solid var(--pink);
-            border-radius: 6px;
-            font-size: 12px;
-        }
-
-        .img-link:hover {
-            background: var(--pink);
-            color: white;
-        }
-
-        .no-img {
-            opacity: 0.4;
-            font-size: 12px;
-        }
+        body { font-family: sans-serif; background: #f4f4f9; padding: 20px; }
+        .user-card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .status-pending { color: orange; font-weight: bold; }
+        .status-verified { color: green; font-weight: bold; }
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; margin-left: 5px; }
+        .btn-v { background: #4CAF50; color: white; }
+        .btn-r { background: #f44336; color: white; }
+        img { cursor: pointer; border-radius: 5px; transition: 0.3s; }
+        img:hover { transform: scale(3); z-index: 100; position: relative; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>MeetU 관리자 대시보드 🧑‍🔧</h1>
-        <p>가입된 유저들의 학생증을 검토하고 승인 상태를 관리하세요.</p>
-        
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>닉네임</th>
-                    <th>학교</th>
-                    <th>학생증 사진</th>
-                    <th>인증 상태</th>
-                    <th>가입일</th>
-                    <th>관리</th>
-                </tr>
-            </thead>
-            <tbody id="user-list">
-                </tbody>
-        </table>
-    </div>
+    <h1>MeetU 가입 승인 대기 명단 📋</h1>
+    <div id="userList"></div>
 
     <script>
-        // 서버에서 유저 목록을 실시간으로 가져오는 함수
-        function loadUsers() {
-            fetch('http://127.0.0.1:8000/admin/users/')
-            .then(res => res.json())
-            .then(users => {
-                const list = document.getElementById('user-list');
-                list.innerHTML = ''; // 기존 목록 초기화
-
-                users.forEach(user => {
-                    const row = document.createElement('tr');
-                    
-                    // 인증 상태에 따른 클래스 설정
-                    const statusClass = `status-${user.is_verified}`;
-                    
-                    row.innerHTML = `
-                        <td>${user.id}</td>
-                        <td>${user.nickname}</td>
-                        <td>${user.university}</td>
-                        <td>
-                            ${user.student_card_url ? 
-                                `<a href="${user.student_card_url}" target="_blank" class="img-link">이미지 보기</a>` : 
-                                `<span class="no-img">미업로드</span>`
-                            }
-                        </td>
-                        <td class="${statusClass}">${user.is_verified.toUpperCase()}</td>
-                        <td>${new Date(user.created_at).toLocaleDateString()}</td>
-                        <td>
-                            <button class="btn btn-approve" onclick="updateStatus(${user.id}, 'approved')">승인</button>
-                            <button class="btn btn-reject" onclick="updateStatus(${user.id}, 'rejected')">반려</button>
-                        </td>
-                    `;
-                    list.appendChild(row);
-                });
-            })
-            .catch(err => console.error("데이터 로드 실패:", err));
+        async function loadUsers() {
+            const res = await fetch('http://127.0.0.1:8000/admin/users/');
+            const users = await res.json();
+            const container = document.getElementById('userList');
+            container.innerHTML = users.map(u => `
+                <div class="user-card">
+                    <div>
+                        <strong>${u.nickname}</strong> (${u.university} / ${u.gender})<br>
+                        상태: <span class="status-${u.is_verified}">${u.is_verified}</span>
+                    </div>
+                    <div>
+                        <img src="${u.student_card_url}" width="80" alt="학생증">
+                    </div>
+                    <div>
+                        <button class="btn btn-v" onclick="updateStatus(${u.id}, 'verified')">승인</button>
+                        <button class="btn btn-r" onclick="updateStatus(${u.id}, 'rejected')">거절</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // 인증 상태 업데이트 (승인/반려) 함수
-        function updateStatus(userId, status) {
-            // PATCH 요청 시 쿼리 스트링으로 status 전달
-            fetch(`http://127.0.0.1:8000/admin/verify/${userId}?status=${status}`, {
-                method: 'PATCH'
-            })
-            .then(res => res.json())
-            .then(data => {
-                alert(data.message);
-                loadUsers(); // 목록 새로고침
-            })
-            .catch(err => {
-                console.error("업데이트 실패:", err);
-                alert("상태 변경 중 에러가 발생했습니다.");
-            });
+        async function updateStatus(uid, status) {
+            await fetch(`http://127.0.0.1:8000/admin/verify/${uid}?status=${status}`, { method: 'PATCH' });
+            alert("처리되었습니다.");
+            loadUsers();
         }
 
-        // 페이지 로드 시 즉시 유저 목록 불러오기
-        window.onload = loadUsers;
+        loadUsers();
     </script>
 </body>
 </html>
