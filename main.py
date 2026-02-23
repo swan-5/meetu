@@ -191,5 +191,6 @@ def handover_room(room_id: int, creator_id: int, new_creator_id: int, db: Sessio
 
 @app.get("/")
 async def read_index():
-    # 현재 실행 파일 위치에서 index.html을 찾아 보냅니다.
-    return FileResponse('index.html')
+    # 경로를 절대 경로로 합쳐서 더 정확하게 파일을 찾게 합니다.
+    html_path = os.path.join(BASE_DIR, "index.html")
+    return FileResponse(html_path)
