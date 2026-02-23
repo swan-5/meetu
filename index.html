@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PinkMeet | 대학생 미팅 매칭</title>
+  <title>MeetU | 대학생 미팅 매칭</title>
   <meta name="description" content="대학생 인증 기반 안전 미팅 매칭. 익명 보호, 5:5 성비, 빠른 오픈채팅 연결!" />
 
   <!-- (선택) 아이콘 폰트: 외부 링크 싫으면 삭제 가능 -->
@@ -711,7 +711,7 @@
       <div class="brand" role="button" tabindex="0" onclick="go('landing')">
         <div class="logo" aria-hidden="true"></div>
         <div>
-          PinkMeet <span style="opacity:.7;font-weight:700;">· 대학생 매칭</span>
+          MeetU <span style="opacity:.7;font-weight:700;">· 대학생 매칭</span>
         </div>
       </div>
 
@@ -773,7 +773,7 @@
               <div class="title-row">
                 <div>
                   <h2>3단계 이용 가이드</h2>
-                  <p class="sub">신청 → 대기 → 결과 + 오픈채팅 연결 (진짜 간단)</p>
+                  <p class="sub">신청 → 대기 → 결과 + 오픈채팅 연결 </p>
                 </div>
                 <button class="btn btn-sm" onclick="go('auth')">신청하러 가기 →</button>
               </div>
@@ -1289,7 +1289,7 @@
     </section>
 
     <footer>
-      © <span id="year"></span> PinkMeet. All rights reserved.
+      © <span id="year"></span> MeetU. All rights reserved.
       <div class="tiny-links">
         <a href="javascript:void(0)" onclick="openModal('terms')">이용약관</a>
         <a href="javascript:void(0)" onclick="openModal('privacy')">개인정보</a>
@@ -1458,7 +1458,7 @@
         value: val('value'),
         chips: Array.from(state.selectedChips)
       };
-      localStorage.setItem('pinkmeet_profile', JSON.stringify(payload));
+      localStorage.setItem('MeetU_profile', JSON.stringify(payload));
       toast('프로필 저장 완료 💾');
       // 결과 페이지에 일부 반영
       hydrateMateCard(payload);
@@ -1533,7 +1533,7 @@
         time: val('meetTime'),
         memo: val('meetMemo')
       };
-      localStorage.setItem('pinkmeet_meet', JSON.stringify(payload));
+      localStorage.setItem('MeetU_meet', JSON.stringify(payload));
       document.getElementById('meetHint').textContent = '✅ 저장 완료! (데모: 브라우저에 저장됨)';
       toast('약속 정보 저장 완료 💾');
     }
@@ -1579,7 +1579,7 @@
 
     // Load saved profile if exists
     try{
-      const p = JSON.parse(localStorage.getItem('pinkmeet_profile') || 'null');
+      const p = JSON.parse(localStorage.getItem('MeetU_profile') || 'null');
       if(p){
         const map = ['nick','univ','major','age','height','mbti','hobby','charm','prefAge','prefUnivGroup','avoid','value'];
         map.forEach(k => {
@@ -1595,7 +1595,7 @@
         }
         hydrateMateCard(p);
       }
-      const meet = JSON.parse(localStorage.getItem('pinkmeet_meet') || 'null');
+      const meet = JSON.parse(localStorage.getItem('MeetU_meet') || 'null');
       if(meet){
         if(document.getElementById('meetPlace')) document.getElementById('meetPlace').value = meet.place || '';
         if(document.getElementById('meetTime')) document.getElementById('meetTime').value = meet.time || '';
